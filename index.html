@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DUKIKS POS</title>
+<title>DUKIKS POS - EMERGENCY BACKUP</title>
 <style>
 body { font-family: Arial, sans-serif; margin: 0; padding: 110px 20px 40px 20px; background-color: #ff6b00; font-size: 22px; }
 .logo-container { text-align: center; margin-top: 20px; }
@@ -56,14 +56,12 @@ td { color: black; border-bottom: 1px solid #eee; }
 </div>
 
 <h1>Dukik's Hungry Hub</h1>
-<div class="subtitle">Order Intake Created by Naydex: Dukik's Hungry Hub</div>
+<div class="subtitle">Manual Menu Mode (Reliable for Opening)</div>
 
 <div class="panel">
   <table>
     <thead><tr><th>Type</th><th>Menu</th><th>Code</th><th>Price</th></tr></thead>
-    <tbody id="menuDisplayBody">
-      <tr><td colspan="4" style="text-align:center;">Loading menu items...</td></tr>
-    </tbody>
+    <tbody id="menuDisplayBody"></tbody>
   </table>
 </div>
 
@@ -85,132 +83,24 @@ td { color: black; border-bottom: 1px solid #eee; }
       <option value="Alegria Palms 1">Alegria Palms 1</option>
       <option value="Alegria Palms 2">Alegria Palms 2</option>
       <option value="Alegria Palms 3">Alegria Palms 3</option>
-      <option value="Aldea Del Sol">Aldea Del Sol</option>
-      <option value="Almond Drive">Almond Drive</option>
-      <option value="Amisa Private Residences">Amisa Private Residences</option>
-      <option value="Anami Homes">Anami Homes</option>
-      <option value="Angelica Homes">Angelica Homes</option>
-      <option value="Arira Homes">Arira Homes</option>
-      <option value="Arterra Bayfront Residences">Arterra Bayfront Residences</option>
-      <option value="Aruga Resort and Residences">Aruga Resort and Residences</option>
-      <option value="Astana">Astana</option>
-      <option value="Astele">Astele</option>
-      <option value="Bali Residences">Bali Residences</option>
-      <option value="Bayanihan Flats Mactan">Bayanihan Flats Mactan</option>
-      <option value="Bayswater">Bayswater</option>
-      <option value="BF Bellaville">BF Bellaville</option>
-      <option value="BF Country Homes">BF Country Homes</option>
-      <option value="BF Townhomes">BF Townhomes</option>
-      <option value="Blue Coast Residences">Blue Coast Residences</option>
-      <option value="Breeza Coves">Breeza Coves</option>
-      <option value="Breeza Palms">Breeza Palms</option>
-      <option value="Breeza Scapes">Breeza Scapes</option>
-      <option value="Brentwood">Brentwood</option>
-      <option value="Brookfield">Brookfield</option>
-      <option value="Camella Mactan">Camella Mactan</option>
-      <option value="Camella Montserrat">Camella Montserrat</option>
-      <option value="Casa Nuestra">Casa Nuestra</option>
-      <option value="Cebu Mutual Homes">Cebu Mutual Homes</option>
-      <option value="City Homes">City Homes</option>
-      <option value="CKL Homes">CKL Homes</option>
-      <option value="Collinwood">Collinwood</option>
-      <option value="Coral Point Gardens">Coral Point Gardens</option>
-      <option value="Corinthians">Corinthians</option>
-      <option value="Costa Del Sol">Costa Del Sol</option>
-      <option value="Costa Liya">Costa Liya</option>
-      <option value="Costa Mira Beachtown">Costa Mira Beachtown</option>
       <option value="Deca Homes Mactan 1">Deca Homes Mactan 1</option>
       <option value="Deca Homes Mactan 2">Deca Homes Mactan 2</option>
       <option value="Deca Homes Mactan 3">Deca Homes Mactan 3</option>
       <option value="Deca Homes Mactan 4">Deca Homes Mactan 4</option>
       <option value="Deca Homes Mactan 5">Deca Homes Mactan 5</option>
-      <option value="Discovery Bay">Discovery Bay</option>
-      <option value="East Ridge">East Ridge</option>
-      <option value="El Sol">El Sol</option>
-      <option value="Evissa">Evissa</option>
-      <option value="Fairchild">Fairchild</option>
-      <option value="Fleur de Ville">Fleur de Ville</option>
-      <option value="Futura Homes">Futura Homes</option>
-      <option value="Genesis">Genesis</option>
-      <option value="Grant Ville">Grant Ville</option>
-      <option value="Greenville">Greenville</option>
-      <option value="Haniyyah Phase 1">Haniyyah Phase 1</option>
-      <option value="Haniyyah Phase 2">Haniyyah Phase 2</option>
-      <option value="Haniyyah Phase 3">Haniyyah Phase 3</option>
-      <option value="Happy Homes">Happy Homes</option>
-      <option value="Heritage Homes">Heritage Homes</option>
-      <option value="Island Homes">Island Homes</option>
-      <option value="Kona Villas">Kona Villas</option>
-      <option value="La Aldea Buena Mactan">La Aldea Buena Mactan</option>
-      <option value="La Aldea Del Mar">La Aldea Del Mar</option>
-      <option value="LADR">LADR</option>
-      <option value="Laris">Laris</option>
-      <option value="Mactan Country Residences">Mactan Country Residences</option>
-      <option value="Mactan Oasis Garden">Mactan Oasis Garden</option>
-      <option value="Mactan Plains">Mactan Plains</option>
-      <option value="Mactan Tropics">Mactan Tropics</option>
-      <option value="Mactan Ville">Mactan Ville</option>
-      <option value="Metropolis Subdivision">Metropolis Subdivision</option>
-      <option value="Modena">Modena</option>
-      <option value="Navona">Navona</option>
-      <option value="Noah Townhouse">Noah Townhouse</option>
-      <option value="One Manchester Place">One Manchester Place</option>
-      <option value="One Pacific Residences">One Pacific Residences</option>
-      <option value="Pacific Grand Townhomes">Pacific Grand Townhomes</option>
-      <option value="Pacific Grand Villas">Pacific Grand Villas</option>
-      <option value="Pacific Grande 1">Pacific Grande 1</option>
-      <option value="Pacific Grande 2">Pacific Grande 2</option>
-      <option value="Park Place 1">Park Place 1</option>
-      <option value="Park Place 2">Park Place 2</option>
-      <option value="Paseo Grove">Paseo Grove</option>
-      <option value="Plumera">Plumera</option>
-      <option value="Portville Mactan">Portville Mactan</option>
-      <option value="Prima Vittoria">Prima Vittoria</option>
-      <option value="The Reef Residences">The Reef Residences</option>
-      <option value="Richwood Homes">Richwood Homes</option>
-      <option value="Rodriguez">Rodriguez</option>
-      <option value="Royal Oceancrest Mactan">Royal Oceancrest Mactan</option>
       <option value="Saekyung">Saekyung</option>
-      <option value="Saint Dominics Place">Saint Dominics Place</option>
-      <option value="San Carlos Village">San Carlos Village</option>
-      <option value="Simbulan Subdivision">Simbulan Subdivision</option>
-      <option value="Solana">Solana</option>
-      <option value="Solare">Solare</option>
-      <option value="Soltana Nature Residences">Soltana Nature Residences</option>
-      <option value="Southport">Southport</option>
-      <option value="Sta Monica Homes">Sta Monica Homes</option>
-      <option value="Summer Ville">Summer Ville</option>
-      <option value="Summerville 1">Summerville 1</option>
-      <option value="Sunberry">Sunberry</option>
-      <option value="Tambuli Seaside Living">Tambuli Seaside Living</option>
-      <option value="The Horizons Residences">The Horizons Residences</option>
-      <option value="Turnberry Place">Turnberry Place</option>
-      <option value="Valencia Residences">Valencia Residences</option>
-      <option value="Valle Verde Mactan">Valle Verde Mactan</option>
-      <option value="Villa Del Rio Mactan">Villa Del Rio Mactan</option>
-      <option value="Villa Erica">Villa Erica</option>
-      <option value="Villa Iluminada">Villa Iluminada</option>
-      <option value="Villa Josefina">Villa Josefina</option>
-      <option value="Villa Ranida">Villa Ranida</option>
-      <option value="Villa Ruffina 1">Villa Ruffina 1</option>
-      <option value="Villa Ruffina 2">Villa Ruffina 2</option>
-      <option value="Villas Magallanes">Villas Magallanes</option>
-      <option value="Vista Mar Residential Estates">Vista Mar Residential Estates</option>
-      <option value="Vistabella">Vistabella</option>
-      <option value="Vittoria">Vittoria</option>
-      <option value="Woodgrove">Woodgrove</option>
-      <option value="Woodland Park Residences">Woodland Park Residences</option>
-    </select>
+      <option value="Pacific Grand Villas">Pacific Grand Villas</option>
+      </select>
   </div>
 
   <div id="subdivisionGroup" class="hidden-field">
     <div class="input-row">
       <label>Block/Floor#</label>
-      <input type="text" id="blockFloor" placeholder="Numbers only" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+      <input type="text" id="blockFloor" placeholder="Numbers only">
     </div>
     <div class="input-row">
       <label>Lot/Room#</label>
-      <input type="text" id="lotRoom" placeholder="Numbers only" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+      <input type="text" id="lotRoom" placeholder="Numbers only">
     </div>
   </div>
 
@@ -241,86 +131,41 @@ td { color: black; border-bottom: 1px solid #eee; }
     <div class="summary-card"><div>Total Sales</div><span id="summaryTotalSales">₱0.00</span></div>
     <div class="summary-card"><div>Best Seller</div><span id="summaryBestSeller">None</span></div>
   </div>
-
-<button class="action-btn" id="copyTableBtn">⧉ Copy Table</button>
-
-<div style="overflow-x:auto;">
-    <table class="history-table">
-      <thead>
-        <tr>
-            <th>Ref #</th><th>Date</th><th>Time</th><th>Name</th><th>Full Address</th><th>Total</th><th>Orders</th><th>Notes</th><th>Status</th><th>Payment Mode</th><th>Action</th><th>Summary</th>
-        </tr>
-      </thead>
-      <tbody id="historyBox"></tbody>
-    </table>
+  <tbody id="historyBox"></tbody>
 </div>
 
-<button class="action-btn" id="newDayBtn" onclick="startNewDay()">Start a New Day</button>
-
 <script>
-let menuData = []; 
-
-async function fetchMenu() {
-  // We use your direct CSV link here
-  const menuSheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSa7lcRIlEfObIPUvMPgCyonedYt367Rmgun_QpBRvWjkp4RyDMKy_io1d8wrnEvgJG7rufwuKrANlH/pub?gid=0&single=true&output=csv"; 
-
-  try {
-    // We use 'no-cache' to ensure we get the latest menu without breaking the URL
-    const response = await fetch(menuSheetURL, { cache: "no-cache" });
-    
-    if (!response.ok) throw new Error('Network response was not ok');
-    
-    const csvData = await response.text();
-    const rows = csvData.split(/\r?\n/).filter(row => row.trim() !== "");
-    
-    menuData = rows.map(row => {
-      // Split by comma but handle potential quotes
-      const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-      const rawPrice = cols[2] ? cols[2].replace(/[^0-9.]/g, '') : "0";
-      return {
-        menu: cols[0]?.replace(/^"|"$/g, '').trim(),
-        code: cols[1]?.replace(/^"|"$/g, '').trim(),
-        price: parseFloat(rawPrice)
-      };
-    }).filter(item => item.menu && !isNaN(item.price));
-
-    if (menuData.length === 0) throw new Error('No items found');
-
-    renderMenuDisplay();
-    updateOrderDropdowns();
-  } catch (error) {
-    console.error("Menu load failed:", error);
-    document.getElementById("menuDisplayBody").innerHTML = 
-      `<tr><td colspan="4" style="color:red; text-align:center; font-weight:bold; padding:20px;">
-        ⚠️ Error loading Menu Database. Please refresh the page<br>
-        <button onclick="fetchMenu()" style="margin-top:10px; padding:5px 15px; cursor:pointer; border-radius:8px;">Retry Now</button>
-      </td></tr>`;
-  }
-}
+// --- MANUAL MENU SETUP ---
+// Edit your items here directly. No more Google Sheet errors!
+const menuData = [
+  { menu: "Pork Steak with Rice", code: "PSWR", price: 149.00 },
+  { menu: "Chicken Inasal with Rice", code: "CIWR", price: 139.00 },
+  { menu: "Beef Tapa with Rice", code: "BTWR", price: 159.00 },
+  { menu: "Extra Rice", code: "ER", price: 20.00 },
+  { menu: "Coke Mismo", code: "CM", price: 25.00 }
+];
 
 function renderMenuDisplay() {
   const body = document.getElementById("menuDisplayBody");
-  if(!body) return;
   body.innerHTML = ""; 
   menuData.forEach(item => {
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td>Meal</td><td>${item.menu}</td><td>${item.code}</td><td>₱${formatPHP(item.price)}</td>`;
+    tr.innerHTML = `<td>Meal</td><td>${item.menu}</td><td>${item.code}</td><td>₱${item.price.toFixed(2)}</td>`;
     body.appendChild(tr);
   });
 }
 
 function updateOrderDropdowns() {
-  const selects = document.querySelectorAll(".item-select");
   const optionsHtml = `<option value="">Select</option>` + 
     menuData.map(m => `<option value="${m.code}">${m.menu}</option>`).join('');
-  
-  selects.forEach(sel => {
+  document.querySelectorAll(".item-select").forEach(sel => {
     const currentVal = sel.value;
     sel.innerHTML = optionsHtml;
-    sel.value = currentVal; 
+    sel.value = currentVal;
   });
 }
 
+// --- APP LOGIC ---
 const orderBody = document.getElementById("orderBody");
 const historyBox = document.getElementById("historyBox");
 const nameInp = document.getElementById("customerName");
@@ -330,21 +175,14 @@ const lotInp = document.getElementById("lotRoom");
 const addrInp = document.getElementById("customerAddress");
 let orderCounter = parseInt(localStorage.getItem("dukiks_counter")) || 101;
 
-window.onload = async () => {
+window.onload = () => {
+  renderMenuDisplay();
+  addOrderRow();
   updateClock();
   toggleAddressFields();
-  await fetchMenu();
-  
   if(localStorage.getItem("dukiks_history")) {
     historyBox.innerHTML = localStorage.getItem("dukiks_history");
-    historyBox.querySelectorAll('tr').forEach(row => {
-      const s1 = row.cells[8]?.querySelector('select');
-      const s2 = row.cells[9]?.querySelector('select');
-      if(s1) { s1.value = s1.getAttribute('data-val'); s1.onchange = saveHistory; }
-      if(s2) { s2.value = s2.getAttribute('data-val'); s2.onchange = saveHistory; }
-    });
   }
-  addOrderRow();
   updateSummary();
 };
 
@@ -359,8 +197,6 @@ function toggleAddressFields() {
     homeGroup.classList.add("hidden-field");
   }
 }
-
-function formatPHP(num) { return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 
 function addOrderRow() {
   const tr = document.createElement("tr");
@@ -380,7 +216,7 @@ function updateTable() {
     const qty = parseInt(row.querySelector("input").value) || 0;
     const item = menuData.find(m => m.code === code);
     const price = item ? item.price * qty : 0;
-    row.querySelector(".row-total").textContent = "₱" + formatPHP(price);
+    row.querySelector(".row-total").textContent = "₱" + price.toFixed(2);
     grandTotal += price;
     if (i === rows.length - 1 && code !== "") addOrderRow();
   });
@@ -388,43 +224,11 @@ function updateTable() {
   if(oldGT) oldGT.remove();
   const gtRow = document.createElement("tr");
   gtRow.id = "grandTotalRow";
-  gtRow.innerHTML = `<td colspan="2" style="text-align:right; font-weight:bold;">Grand Total:</td><td style="color:red; font-weight:bold;">₱${formatPHP(grandTotal)}</td>`;
+  gtRow.innerHTML = `<td colspan="2" style="text-align:right; font-weight:bold;">Grand Total:</td><td style="color:red; font-weight:bold;">₱${grandTotal.toFixed(2)}</td>`;
   orderBody.appendChild(gtRow);
 }
 
-function saveHistory() {
-    historyBox.querySelectorAll('select').forEach(sel => sel.setAttribute('data-val', sel.value));
-    localStorage.setItem("dukiks_history", historyBox.innerHTML);
-    updateSummary();
-}
-
-function updateSummary() {
-  const rows = historyBox.querySelectorAll("tr");
-  let totalSales = 0;
-  let itemCounts = {};
-  rows.forEach(row => {
-    const priceText = row.cells[5].innerText.replace('₱', '').replace(/,/g, '');
-    totalSales += parseFloat(priceText) || 0;
-    const orderItems = row.cells[6].innerText.split(', ');
-    orderItems.forEach(item => {
-      const code = item.split(' ')[1];
-      if(code) {
-        const qty = parseInt(item.split('x')[0]) || 1;
-        itemCounts[code] = (itemCounts[code] || 0) + qty;
-      }
-    });
-  });
-  let bestItem = "None"; let maxCount = 0;
-  for (const [code, count] of Object.entries(itemCounts)) {
-    if (count > maxCount) { maxCount = count; bestItem = code; }
-  }
-  document.getElementById("summaryTotalOrders").textContent = rows.length;
-  document.getElementById("summaryTotalSales").textContent = "₱" + formatPHP(totalSales);
-  document.getElementById("summaryBestSeller").textContent = bestItem;
-}
-
 document.getElementById("startNewOrderBtn").onclick = function() {
-  const errorMsg = document.getElementById("validationError");
   const rows = orderBody.querySelectorAll("tr:not(#grandTotalRow)");
   let orders = []; let total = 0; let hasItem = false;
 
@@ -435,93 +239,33 @@ document.getElementById("startNewOrderBtn").onclick = function() {
     if(item) { orders.push(`${qty}x ${item.code}`); total += item.price * qty; hasItem = true; }
   });
 
-  if(!nameInp.value.trim() || !hasItem) { errorMsg.style.display = "block"; return; } 
-  errorMsg.style.display = "none";
+  if(!nameInp.value.trim() || !hasItem) { alert("Check Name and Order!"); return; }
 
   const now = new Date();
-  const dateCode = (now.getMonth() + 1).toString().padStart(2, '0') + now.getDate().toString().padStart(2, '0') + now.getFullYear().toString().slice(-2);
-  const refNum = `#${dateCode}${orderCounter}`;
+  const refNum = `#${orderCounter++}`;
   let fullAddress = (commInp.value === "Home") ? addrInp.value : `${commInp.value} - Blk ${blkInp.value}, Lot ${lotInp.value}`;
 
   const hRow = document.createElement("tr");
-  hRow.innerHTML = `
-    <td style="font-weight:bold; color:#ff6b00;">${refNum}</td>
-  <td>${now.getMonth() + 1}/${now.getDate()}/${now.getFullYear()}</td>
-  <td>${now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit', hour12:true})}</td>
-    <td>${nameInp.value}</td>
-    <td>${fullAddress}</td>
-    <td style="font-weight:bold;">₱${formatPHP(total)}</td>
-    <td>${orders.join(", ")}</td>
-    <td>${document.getElementById("specialInstructions").value || '-'}</td>
-    <td><select class="history-select" data-val="Unpaid" onchange="saveHistory()"><option>Unpaid</option><option>Paid</option></select></td>
-    <td><select class="history-select" data-val="GCash" onchange="saveHistory()"><option>GCash</option><option>Cash</option><option>Bank Transfer</option><option>Credit Card</option></select></td>
-    <td style="text-align:center"><button class="del-btn" onclick="deleteRow(this)">🗑️</button></td>
-    <td style="text-align:center"><button class="action-btn" style="width:auto; padding:5px 10px; margin:0; font-size:14px;" onclick="copyOrderSummary(this)">Copy Summary</button></td>
-  `;
-  historyBox.appendChild(hRow);
-  orderCounter++;
-  localStorage.setItem("dukiks_counter", orderCounter);
-  saveHistory();
+  hRow.innerHTML = `<td>${refNum}</td><td>${nameInp.value}</td><td>${fullAddress}</td><td>₱${total.toFixed(2)}</td><td>${orders.join(", ")}</td>`;
+  historyBox.prepend(hRow);
   
-  this.textContent = "✅ Order Logged";
-  this.classList.add("success-state");
-  setTimeout(() => { 
-    this.textContent = "Log Order & Clear"; this.classList.remove("success-state");
-    nameInp.value = ""; addrInp.value = ""; document.getElementById("specialInstructions").value = ""; 
-    blkInp.value = ""; lotInp.value = ""; commInp.value = "Home"; toggleAddressFields();
-    orderBody.innerHTML = ""; addOrderRow();
-  }, 1000);
+  localStorage.setItem("dukiks_counter", orderCounter);
+  localStorage.setItem("dukiks_history", historyBox.innerHTML);
+  updateSummary();
+  
+  // Reset Form
+  nameInp.value = ""; addrInp.value = ""; orderBody.innerHTML = ""; addOrderRow();
 };
 
-function deleteRow(btn) { if(confirm("Delete this order?")) { btn.parentElement.parentElement.remove(); saveHistory(); } }
-function startNewDay() { if(confirm("Reset all data?")) { localStorage.clear(); historyBox.innerHTML = ""; orderCounter = 101; updateSummary(); } }
-
-document.getElementById("copyTableBtn").onclick = function() {
-  let text = "";
-  historyBox.querySelectorAll("tr").forEach(r => {
-    let rowData = [];
-    for (let i = 0; i < r.cells.length - 2; i++) {
-        let cell = r.cells[i];
-        let select = cell.querySelector('select');
-        rowData.push(select ? select.value : cell.innerText);
-    }
-    text += rowData.join("\t") + "\n";
-  });
-  navigator.clipboard.writeText(text);
-};
-
-function copyOrderSummary(btn) {
-  const row = btn.parentElement.parentElement;
-  const orderCodes = row.cells[6].innerText.split(", ");
-  const fullOrderNames = orderCodes.map(item => {
-    const parts = item.split("x ");
-    const qty = parts[0];
-    const code = parts[1];
-    const menuItem = menuData.find(m => m.code === code);
-    return `${qty}x ${menuItem ? menuItem.menu : code}`;
-  }).join("\n");
-
-  const summary = `Order No.: ${row.cells[0].innerText}
-Name: ${row.cells[3].innerText}
-Address: ${row.cells[4].innerText}
-Total: ${row.cells[5].innerText}
-Status: ${row.cells[8].querySelector('select').value}
-Payment: ${row.cells[9].querySelector('select').value}
-Items: 
-${fullOrderNames}`;
-
-  navigator.clipboard.writeText(summary);
-  const oldText = btn.innerText;
-  btn.innerText = "✅ Copied!";
-  setTimeout(() => btn.innerText = oldText, 1500);
+function updateSummary() {
+    const rows = historyBox.querySelectorAll("tr");
+    document.getElementById("summaryTotalOrders").textContent = rows.length;
 }
 
 function updateClock() {
   const now = new Date();
-  const timeDiv = document.getElementById('timePHT');
-  const dateDiv = document.getElementById('datePHT');
-  if(timeDiv) timeDiv.textContent = now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit', hour12:true});
-  if(dateDiv) dateDiv.textContent = now.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'2-digit', year:'numeric'});
+  document.getElementById('timePHT').textContent = now.toLocaleTimeString();
+  document.getElementById('datePHT').textContent = now.toDateString();
 }
 setInterval(updateClock, 1000);
 </script>
