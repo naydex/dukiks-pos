@@ -21,6 +21,11 @@ h1 { text-align: center; font-weight: bold; font-size: 40px; color: white; margi
 
 .panel { max-width: 1000px; width: 100%; margin: 0 auto 40px auto; box-sizing: border-box; }
 
+#orderTable th {
+    color: white !important;
+    background-color: black; /* Just to be sure */
+}
+
 table { border-collapse: collapse; border-radius: 10px; overflow: hidden; background: white; width: 100%; }
 th, td { padding: 10px 15px; text-align: left; }
 th { background-color: black; color: white; }
@@ -65,6 +70,21 @@ td { color: black; border-bottom: 1px solid #eee; }
 .floating-datetime { position: fixed; top: 15px; left: 50%; transform: translateX(-50%); background: rgba(0, 0, 0, 0.85); padding: 10px 25px; border-radius: 50px; text-align: center; z-index: 9999; color: white; }
 .digital-time { font-size: 30px; font-weight: bold; line-height: 1; }
 .date-display { font-size: 16px; margin-top: 5px; }
+
+.required-star { color: #ff3b30; font-size: 14px; margin-left: 4px; }
+
+.error-bump { 
+    border: 2px solid #ff3b30 !important; 
+    animation: shake 0.4s ease-in-out; 
+}
+
+@keyframes shake { 
+    0%, 100% { transform: translateX(0); } 
+    25% { transform: translateX(-5px); } 
+    50% { transform: translateX(5px); } 
+    75% { transform: translateX(-5px); } 
+}
+
 </style>
 </head>
 <body>
@@ -79,7 +99,7 @@ td { color: black; border-bottom: 1px solid #eee; }
 </div>
 
 <h1>Dukik's Hungry Hub</h1>
-<div class="subtitle">Dukik’s Hungry Hub Order Intake Form</div>
+<div class="subtitle">Order Intake Form</div>
 
 <div class="panel">
   <table>
@@ -100,12 +120,12 @@ td { color: black; border-bottom: 1px solid #eee; }
   <div id="validationError" class="error-msg">⚠️ Please check Name, Address, and Items!</div>
   
   <div class="input-row">
-    <label>Name</label>
+    <label>Name <span class="required-star">*</span></label>
     <input type="text" id="customerName" placeholder="Customer Name">
   </div>
 
   <div class="input-row">
-    <label>Community</label>
+    <label>Community <span class="required-star">*</span></label>
     <select id="communitySelect" onchange="toggleAddressFields()">
       <option value="Home">Not in a Subdivision (Home/Street)</option>
       <option value="Ajoya">Ajoya</option>
@@ -233,18 +253,18 @@ td { color: black; border-bottom: 1px solid #eee; }
 
   <div id="subdivisionGroup" class="hidden-field">
     <div class="input-row">
-      <label>Block/Floor#</label>
+      <label>Block/Floor# <span class="required-star">*</span></label>
       <input type="text" id="blockFloor" placeholder="Numbers only" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
     </div>
     <div class="input-row">
-      <label>Lot/Room#</label>
+      <label>Lot/Room# <span class="required-star">*</span></label>
       <input type="text" id="lotRoom" placeholder="Numbers only" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
     </div>
   </div>
 
   <div id="homeAddressGroup">
     <div class="input-row">
-      <label>Home Address</label>
+      <label>Home Address <span class="required-star">*</span></label>
       <input type="text" id="customerAddress" placeholder="Street / Barangay / Landmark">
     </div>
   </div>
@@ -255,13 +275,13 @@ td { color: black; border-bottom: 1px solid #eee; }
   </div>
   
   <table class="order-table" id="orderTable">
-    <thead><tr><th>Order</th><th>Qty</th><th>Price</th></tr></thead>
+    <thead><tr><th>Order <span class="required-star">*</span></th><th>Qty</th><th>Price</th></tr></thead>
     <tbody id="orderBody"></tbody>
   </table>
 
   <button class="action-btn" id="startNewOrderBtn">Log Order & Clear</button>
 <small style="display:block; text-align:center; color:#666; margin-top:-10px; margin-bottom:20px; font-size: 14px; font-weight: normal;">
-  This saves the order to history, clears the form, and generates a unique Reference Number.
+  This button saves the order to history, clears the form, and generates a unique Reference Number.
 </small>
 </div>
 
@@ -283,7 +303,7 @@ td { color: black; border-bottom: 1px solid #eee; }
   <strong style="color: #d84315; display: block; margin-bottom: 5px;">💡 Table Guide:</strong>
   <div style="display: flex; gap: 20px; color: #444; justify-content: center; flex-wrap: wrap;">
     <span><strong>🗑️ (Delete):</strong> Removes order permanently.</span>
-    <span><strong>Copy Order Summary:</strong> Copies full details for the rider/customer.</span>
+    <span><strong>Copy Summary:</strong> Copies full details for the rider/customer.</span>
   </div>
 </div>
 
@@ -429,6 +449,37 @@ function updateSummary() {
 }
 
 document.getElementById("startNewOrderBtn").onclick = function() {
+// 1. CLEAR OLD ERRORS FIRST
+document.querySelectorAll('.error-bump').forEach(el => el.classList.remove('error-bump'));
+
+// 2. CHECK THE FIELDS
+let valid = true;
+const comm = document.getElementById("communitySelect").value;
+
+if (!document.getElementById("customerName").value.trim()) {
+    document.getElementById("customerName").classList.add('error-bump');
+    valid = false;
+}
+
+if (comm === "Home") {
+    if (!document.getElementById("customerAddress").value.trim()) {
+        document.getElementById("customerAddress").classList.add('error-bump');
+        valid = false;
+    }
+} else {
+    if (!document.getElementById("blockFloor").value.trim()) {
+        document.getElementById("blockFloor").classList.add('error-bump');
+        valid = false;
+    }
+    if (!document.getElementById("lotRoom").value.trim()) {
+        document.getElementById("lotRoom").classList.add('error-bump');
+        valid = false;
+    }
+}
+
+// 3. STOP IF ANYTHING IS WRONG
+if (!valid) return;
+
   const errorMsg = document.getElementById("validationError");
   const rows = orderBody.querySelectorAll("tr:not(#grandTotalRow)");
   let orders = []; let total = 0; let hasItem = false;
@@ -465,7 +516,7 @@ document.getElementById("startNewOrderBtn").onclick = function() {
     <td><select class="history-select" data-val="Unpaid" onchange="saveHistory()"><option>Unpaid</option><option>Paid</option></select></td>
     <td><select class="history-select" data-val="GCash" onchange="saveHistory()"><option>GCash</option><option>Cash</option><option>Bank Transfer</option><option>Credit Card</option></select></td>
     <td style="text-align:center"><button class="del-btn" onclick="deleteRow(this)">🗑️</button></td>
-    <td style="text-align:center"><button class="action-btn" style="width:auto; padding:5px 10px; margin:0; font-size:14px;" onclick="copyOrderSummary(this)">Copy Order Summary</button></td>
+    <td style="text-align:center"><button class="action-btn" style="width:auto; padding:5px 10px; margin:0; font-size:14px;" onclick="copyOrderSummary(this)">Copy Summary</button></td>
   `;
   historyBox.appendChild(hRow);
   orderCounter++;
@@ -556,3 +607,5 @@ setInterval(updateClock, 1000);
 </script>
 </body>
 </html>
+
+
