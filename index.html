@@ -127,7 +127,10 @@ td { color: black; border-bottom: 1px solid #eee; }
   <div class="input-row">
     <label>Community <span class="required-star">*</span></label>
     <select id="communitySelect" onchange="toggleAddressFields()">
-      <option value="Home">Not in a Subdivision (Home/Street)</option>
+      <option value="Home">Home Address (Not a Subdivision)</option>
+      <option value="Navona">Navona</option>
+      <option value="Evissa">Evissa</option>
+      <option value="Astana">Astana</option>
       <option value="Ajoya">Ajoya</option>
       <option value="Alberlyn Box Hill Residences">Alberlyn Box Hill Residences</option>
       <option value="Alegria Palms 1">Alegria Palms 1</option>
@@ -141,7 +144,6 @@ td { color: black; border-bottom: 1px solid #eee; }
       <option value="Arira Homes">Arira Homes</option>
       <option value="Arterra Bayfront Residences">Arterra Bayfront Residences</option>
       <option value="Aruga Resort and Residences">Aruga Resort and Residences</option>
-      <option value="Astana">Astana</option>
       <option value="Astele">Astele</option>
       <option value="Bali Residences">Bali Residences</option>
       <option value="Bayanihan Flats Mactan">Bayanihan Flats Mactan</option>
@@ -175,7 +177,6 @@ td { color: black; border-bottom: 1px solid #eee; }
       <option value="Discovery Bay">Discovery Bay</option>
       <option value="East Ridge">East Ridge</option>
       <option value="El Sol">El Sol</option>
-      <option value="Evissa">Evissa</option>
       <option value="Fairchild">Fairchild</option>
       <option value="Fleur de Ville">Fleur de Ville</option>
       <option value="Futura Homes">Futura Homes</option>
@@ -200,7 +201,6 @@ td { color: black; border-bottom: 1px solid #eee; }
       <option value="Mactan Ville">Mactan Ville</option>
       <option value="Metropolis Subdivision">Metropolis Subdivision</option>
       <option value="Modena">Modena</option>
-      <option value="Navona">Navona</option>
       <option value="Noah Townhouse">Noah Townhouse</option>
       <option value="One Manchester Place">One Manchester Place</option>
       <option value="One Pacific Residences">One Pacific Residences</option>
@@ -286,7 +286,7 @@ td { color: black; border-bottom: 1px solid #eee; }
 </div>
 
 <div class="panel history-panel">
-  <h3 style="text-align:center">Order History</h3>
+  <h3 style="text-align:center">Order History Dashboard</h3>
   
   <div class="summary-container">
     <div class="summary-card"><div>Total Orders</div><span id="summaryTotalOrders">0</span></div>
@@ -294,29 +294,26 @@ td { color: black; border-bottom: 1px solid #eee; }
     <div class="summary-card"><div>Best Seller</div><span id="summaryBestSeller">None</span></div>
   </div>
 
-<button class="action-btn" id="copyTableBtn">⧉ Copy Table</button>
-<small style="display:block; text-align:center; color:#C2C2C2; margin-top:-10px; margin-bottom:20px; font-size: 14px; font-weight: normal;">
-  This button copies the table below to your clipboard and automatically opens The Sales Log Google Sheet for easy pasting.
-</small>
-
-<div style="background: #fff8f0; border: 1px solid #ffccbc; padding: 12px; border-radius: 8px; margin: 20px 0 10px 0; font-size: 14px; text-align: center;">
-  <strong style="color: #d84315; display: block; margin-bottom: 5px;">Table Guide:</strong>
-  
-  <div style="display: flex; flex-direction: column; gap: 5px; color: #444; align-items: center;">
-    <span><strong>🗑️ (Delete):</strong> Removes order permanently.</span>
-    <span><strong>Copy Summary:</strong> Copies order details and opens messenger group chat for the rider/customer</span>
+  <div class="summary-card" style="text-align: left; padding: 20px; width: 100%; box-sizing: border-box; margin-bottom: 20px;">
+    <div style="text-align: center; margin-bottom: 15px; color: #ff6b00; font-size: 12px; text-transform: uppercase; font-weight: bold; letter-spacing: 1px;">
+      Current Inventory / Item Breakdown
+    </div>
+    <div id="itemBreakdown" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+      </div>
   </div>
-</div>
 
-<div style="overflow-x:auto;">
-  <table class="history-table">
-
+  <button class="action-btn" id="copyTableBtn">⧉ Copy Table</button>
+  <small style="display:block; text-align:center; color:#C2C2C2; margin-top:-10px; margin-bottom:20px; font-size: 14px;">
+    Copies table to clipboard and opens the Sales Log.
+  </small>
 
   <div style="overflow-x:auto;">
     <table class="history-table">
       <thead>
         <tr>
-            <th>Ref #</th><th>Date</th><th>Time</th><th>Name</th><th>Full Address</th><th>Total</th><th>Orders</th><th>Notes</th><th>Status</th><th>Payment Mode</th><th>Action</th><th>Summary</th>
+          <th>Ref#</th><th>Date</th><th>Time</th><th>Summary</th><th>Status</th>
+          <th>Mode</th><th>Name</th><th>Address</th><th>Total</th><th>Orders</th>
+          <th>Notes</th><th>Action</th>
         </tr>
       </thead>
       <tbody id="historyBox"></tbody>
@@ -354,18 +351,11 @@ window.onload = () => {
   addOrderRow();
   if(localStorage.getItem("dukiks_history")) {
     historyBox.innerHTML = localStorage.getItem("dukiks_history");
-    
     historyBox.querySelectorAll('tr').forEach(row => {
-      const statusSelect = row.cells[8]?.querySelector('select');
-      const paySelect = row.cells[9]?.querySelector('select');
-      
-      if(statusSelect && statusSelect.getAttribute('data-val')) {
-        statusSelect.value = statusSelect.getAttribute('data-val');
-      }
-      if(paySelect && paySelect.getAttribute('data-val')) {
-        paySelect.value = paySelect.getAttribute('data-val');
-      }
-      
+      const statusSelect = row.cells[4]?.querySelector('select');
+      const paySelect = row.cells[5]?.querySelector('select');
+      if(statusSelect && statusSelect.getAttribute('data-val')) statusSelect.value = statusSelect.getAttribute('data-val');
+      if(paySelect && paySelect.getAttribute('data-val')) paySelect.value = paySelect.getAttribute('data-val');
       if(statusSelect) statusSelect.onchange = saveHistory;
       if(paySelect) paySelect.onchange = saveHistory;
     });
@@ -431,103 +421,112 @@ function updateSummary() {
   const rows = historyBox.querySelectorAll("tr");
   let totalSales = 0;
   let itemCounts = {};
+
+  // 1. Initialize all menu items to 0 so they show up even if not sold
+  menuData.forEach(m => { itemCounts[m.menu] = 0; });
+
   rows.forEach(row => {
-    const priceText = row.cells[5].innerText.replace('₱', '').replace(/,/g, '');
+    // 2. Calculate Sales (Column 8)
+    const priceText = row.cells[8].innerText.replace('₱', '').replace(/,/g, '');
     totalSales += parseFloat(priceText) || 0;
-    const orderItems = row.cells[6].innerText.split(', ');
-    orderItems.forEach(item => {
-      const code = item.split(' ')[1];
-      if(code) {
-        const qty = parseInt(item.split('x')[0]) || 1;
-        itemCounts[code] = (itemCounts[code] || 0) + qty;
+
+    // 3. Count Quantities (Column 9)
+    const orderItems = row.cells[9].innerText.split(', ');
+    orderItems.forEach(itemStr => {
+      const parts = itemStr.split('x ');
+      if(parts.length > 1) {
+        const qty = parseInt(parts[0]) || 0;
+        const code = parts[1];
+        const menuItem = menuData.find(m => m.code === code);
+        if(menuItem) {
+          itemCounts[menuItem.menu] += qty;
+        }
       }
     });
   });
-  let bestItem = "None"; let maxCount = 0;
-  for (const [code, count] of Object.entries(itemCounts)) {
-    if (count > maxCount) { maxCount = count; bestItem = code; }
-  }
+
+  // 4. Update the 3 Top Cards
   document.getElementById("summaryTotalOrders").textContent = rows.length;
   document.getElementById("summaryTotalSales").textContent = "₱" + formatPHP(totalSales);
+  
+  let bestItem = "None"; let maxCount = 0;
+  for (const [name, count] of Object.entries(itemCounts)) {
+    if (count > maxCount && count > 0) { maxCount = count; bestItem = name; }
+  }
   document.getElementById("summaryBestSeller").textContent = bestItem;
+
+  // 5. Render the 3-column Breakdown
+  const breakdownDiv = document.getElementById("itemBreakdown");
+  if(breakdownDiv) {
+    breakdownDiv.innerHTML = Object.entries(itemCounts)
+      .map(([name, count]) => `
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding: 5px 0;">
+          <span style="font-size: 13px; color: #ddd; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${name}</span>
+          <span style="color: #ff6b00; font-weight: bold; font-size: 16px;">${count}</span>
+        </div>
+      `).join('');
+  }
 }
 
 document.getElementById("startNewOrderBtn").onclick = function() {
-// 1. CLEAR OLD ERRORS FIRST
-document.querySelectorAll('.error-bump').forEach(el => el.classList.remove('error-bump'));
-
-// 2. CHECK THE FIELDS
-let valid = true;
-const comm = document.getElementById("communitySelect").value;
-
-if (!document.getElementById("customerName").value.trim()) {
-    document.getElementById("customerName").classList.add('error-bump');
-    valid = false;
-}
-
-if (comm === "Home") {
-    if (!document.getElementById("customerAddress").value.trim()) {
-        document.getElementById("customerAddress").classList.add('error-bump');
-        valid = false;
-    }
-} else {
-    if (!document.getElementById("blockFloor").value.trim()) {
-        document.getElementById("blockFloor").classList.add('error-bump');
-        valid = false;
-    }
-    if (!document.getElementById("lotRoom").value.trim()) {
-        document.getElementById("lotRoom").classList.add('error-bump');
-        valid = false;
-    }
-}
-
-// 3. STOP IF ANYTHING IS WRONG
-if (!valid) return;
-
-  const errorMsg = document.getElementById("validationError");
+  document.querySelectorAll('.error-bump').forEach(el => el.classList.remove('error-bump'));
+  let valid = true;
+  const comm = commInp.value;
+  if (!nameInp.value.trim()) { nameInp.classList.add('error-bump'); valid = false; }
+  if (comm === "Home") {
+      if (!addrInp.value.trim()) { addrInp.classList.add('error-bump'); valid = false; }
+  } else {
+      if (!blkInp.value.trim()) { blkInp.classList.add('error-bump'); valid = false; }
+      if (!lotInp.value.trim()) { lotInp.classList.add('error-bump'); valid = false; }
+  }
   const rows = orderBody.querySelectorAll("tr:not(#grandTotalRow)");
   let orders = []; let total = 0; let hasItem = false;
-
   rows.forEach(r => {
     const code = r.querySelector("select").value;
     const qty = r.querySelector("input").value;
     const item = menuData.find(m => m.code === code);
     if(item) { orders.push(`${qty}x ${item.code}`); total += item.price * qty; hasItem = true; }
   });
-
-  if(!nameInp.value.trim() || !hasItem) {
-      errorMsg.style.display = "block"; 
-      return;
-  } 
-  errorMsg.style.display = "none";
-
+  if(!valid || !hasItem) { document.getElementById("validationError").style.display = "block"; return; }
+  document.getElementById("validationError").style.display = "none";
+  
   const now = new Date();
   const dateCode = (now.getMonth() + 1).toString().padStart(2, '0') + now.getDate().toString().padStart(2, '0') + now.getFullYear().toString().slice(-2);
   const refNum = `#${dateCode}${orderCounter}`;
-  
-  let fullAddress = (commInp.value === "Home") ? addrInp.value : `${commInp.value} - Blk ${blkInp.value}, Lot ${lotInp.value}`;
+  let fullAddress = (comm === "Home") ? addrInp.value : `${comm} - Blk ${blkInp.value}, Lot ${lotInp.value}`;
 
   const hRow = document.createElement("tr");
   hRow.innerHTML = `
     <td style="font-weight:bold; color:#ff6b00;">${refNum}</td>
-  <td>${now.getMonth() + 1}/${now.getDate()}/${now.getFullYear()}</td>
-  <td>${now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit', hour12:true})}</td>
+    <td>${now.getMonth() + 1}/${now.getDate()}/${now.getFullYear()}</td>
+    <td>${now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit', hour12:true})}</td>
+    <td style="text-align:center"><button class="action-btn" style="width:auto; padding:5px 10px; margin:0; font-size:14px;" onclick="copyOrderSummary(this)">Copy Summary</button></td>
+    <td><select class="history-select" data-val="Unpaid" onchange="saveHistory()"><option>Unpaid</option><option>Paid</option></select></td>
+    <td><select class="history-select" data-val="GCash" onchange="saveHistory()"><option>GCash</option><option>Cash</option><option>Bank Transfer</option><option>Credit Card</option></select></td>
     <td>${nameInp.value}</td>
     <td>${fullAddress}</td>
     <td style="font-weight:bold;">₱${formatPHP(total)}</td>
     <td>${orders.join(", ")}</td>
     <td>${document.getElementById("specialInstructions").value || '-'}</td>
-    <td><select class="history-select" data-val="Unpaid" onchange="saveHistory()"><option>Unpaid</option><option>Paid</option></select></td>
-    <td><select class="history-select" data-val="GCash" onchange="saveHistory()"><option>GCash</option><option>Cash</option><option>Bank Transfer</option><option>Credit Card</option></select></td>
     <td style="text-align:center"><button class="del-btn" onclick="deleteRow(this)">🗑️</button></td>
-    <td style="text-align:center"><button class="action-btn" style="width:auto; padding:5px 10px; margin:0; font-size:14px;" onclick="copyOrderSummary(this)">Copy Summary</button></td>
   `;
   historyBox.appendChild(hRow);
   orderCounter++;
   localStorage.setItem("dukiks_counter", orderCounter);
   saveHistory();
   
-  this.textContent = "✅ Order Logged";
+  // --- START AUTO-COPY ---
+  const summaryAuto = `Order No.: ${refNum}\nDate and time: ${now.getMonth() + 1}/${now.getDate()}/${now.getFullYear()} ${now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit', hour12:true})}\nName: ${nameInp.value}\nAddress: ${fullAddress}\nTotal: ₱${formatPHP(total)}\nUnpaid, GCash\n\nOrder/s: \n${orders.map(item => {
+    const p = item.split("x ");
+    const m = menuData.find(menu => menu.code === p[1]);
+    return `${p[0]}x ${m ? m.menu : p[1]}`;
+  }).join("\n")}\n\nSpecial Notes: ${document.getElementById("specialInstructions").value || '-'}`;
+
+  navigator.clipboard.writeText(summaryAuto);
+  window.open("https://www.messenger.com/t/1629578618166443", "_blank");
+  // --- END AUTO-COPY ---
+
+  this.textContent = "✅ Logged & Copied!";
   this.classList.add("success-state");
   setTimeout(() => { 
     this.textContent = "Log Order & Clear"; this.classList.remove("success-state");
@@ -538,42 +537,53 @@ if (!valid) return;
 };
 
 function deleteRow(btn) { if(confirm("Delete this order?")) { btn.parentElement.parentElement.remove(); saveHistory(); } }
-function startNewDay() { if(confirm("Reset all data?")) { localStorage.clear(); historyBox.innerHTML = ""; orderCounter = 101; updateSummary(); } }
+function startNewDay() { if(confirm("Reset all data?")) { localStorage.clear(); historyBox.innerHTML = ""; orderCounter = 101; updateSummary(); location.reload(); } }
 
 document.getElementById("copyTableBtn").onclick = function() {
   let text = "";
   historyBox.querySelectorAll("tr").forEach(r => {
-    let rowData = [];
-    for (let i = 0; i < r.cells.length - 2; i++) {
-        let cell = r.cells[i];
-        let select = cell.querySelector('select');
-        rowData.push(select ? select.value : cell.innerText);
-    }
+    // We grab specific cells to match your Google Sheet format:
+    // Ref#, Date, Time, Name, Address, Total, Status, Mode, Orders, Notes
+    const ref    = r.cells[0].innerText;
+    const date   = r.cells[1].innerText;
+    const time   = r.cells[2].innerText;
+    const status = r.cells[4].querySelector('select').value;
+    const mode   = r.cells[5].querySelector('select').value;
+    const name   = r.cells[6].innerText;
+    const addr   = r.cells[7].innerText;
+    const total  = r.cells[8].innerText;
+    const orders = r.cells[9].innerText;
+    const notes  = r.cells[10].innerText;
+
+    const rowData = [ref, date, time, name, addr, total, status, mode, orders, notes];
     text += rowData.join("\t") + "\n";
   });
-  navigator.clipboard.writeText(text);
   
+  navigator.clipboard.writeText(text);
   window.open("https://docs.google.com/spreadsheets/d/1Y0fxsaI3jva56h42jg9jRq1FS6vmbXmxl5X2e-cc69I/edit?gid=1589209915#gid=1589209915", "_blank");
-
+  
   const originalHtml = this.innerHTML;
-  this.innerHTML = "✅ Copied & Sheet Opened";
+  this.innerHTML = "✅ Copied (Sheet Format)";
   this.classList.add("success-state");
   setTimeout(() => { this.innerHTML = originalHtml; this.classList.remove("success-state"); }, 2000);
 };
 
 function copyOrderSummary(btn) {
   const row = btn.parentElement.parentElement;
-  const refNum = row.cells[0].innerText;
-  const dateStr = row.cells[1].innerText;
-  const timeStr = row.cells[2].innerText;
-  const name = row.cells[3].innerText;
-  const location = row.cells[4].innerText;
-  const total = row.cells[5].innerText;
-  const notes = row.cells[7].innerText;
-  const status = row.cells[8].querySelector('select').value;
-  const payMode = row.cells[9].querySelector('select').value;
+  
+  // Mapping for the Copy Summary Button (Visual Layout)
+  const refNum   = row.cells[0].innerText;
+  const dateStr  = row.cells[1].innerText;
+  const timeStr  = row.cells[2].innerText;
+  const status   = row.cells[4].querySelector('select').value;
+  const payMode  = row.cells[5].querySelector('select').value;
+  const name     = row.cells[6].innerText;
+  const location = row.cells[7].innerText;
+  const total    = row.cells[8].innerText;
+  const ordersRaw = row.cells[9].innerText;
+  const notes    = row.cells[10].innerText;
 
-  const orderCodes = row.cells[6].innerText.split(", ");
+  const orderCodes = ordersRaw.split(", ");
   const fullOrderNames = orderCodes.map(item => {
     const parts = item.split("x ");
     const qty = parts[0];
@@ -582,28 +592,13 @@ function copyOrderSummary(btn) {
     return `${qty}x ${menuItem ? menuItem.menu : code}`;
   }).join("\n");
 
-  const summary = `Order No.: ${refNum}
-Date and time: ${dateStr} ${timeStr}
-Name: ${name}
-Address: ${location}
-Total: ${total}
-${status}, ${payMode}
+  const summary = `Order No.: ${refNum}\nDate and time: ${dateStr} ${timeStr}\nName: ${name}\nAddress: ${location}\nTotal: ${total}\n${status}, ${payMode}\n\nOrder/s: \n${fullOrderNames}\n\nSpecial Notes: ${notes}`;
 
-Order/s: 
-${fullOrderNames}
-
-Special Notes: ${notes}`;
-
-  // 1. Copy to clipboard
   navigator.clipboard.writeText(summary);
-
-  // 2. Open Messenger Group
   window.open("https://www.messenger.com/t/1629578618166443", "_blank");
-
-  // 3. Visual feedback
   const originalText = btn.innerText;
-  btn.innerText = "✅ Copied to Messenger!";
-  setTimeout(() => { btn.innerText = originalText; }, 2500);
+  btn.innerText = "✅ Copied!";
+  setTimeout(() => { btn.innerText = originalText; }, 1500);
 }
 
 function updateClock() {
@@ -615,8 +610,10 @@ function updateClock() {
 }
 setInterval(updateClock, 1000);
 </script>
+
 </body>
 </html>
+
 
 
 
