@@ -180,7 +180,7 @@ td { color: black; border-bottom: 1px solid #eee; }
 <script>
 // --- SHEET SYNC LOGIC ---
 const menuSheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRUovN3y6yfyLJ0yLVqvrvEEUaipZ3gf6mkuSqJ4oBOg0cEVNwwDs9PC6TH2U0u9kE4a3jEaugquiGg/pub?gid=159409582&single=true&output=csv";
-const communitySheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRUovN3y6yfyLJ0yLVqvrvEEUaipZ3gf6mkuSqJ4oBOg0cEVNwwDs9PC6TH2U0u9kE4a3jEaugquiGg/pub?gid=1695333389&single=true&output=csv";
+const communitySheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRUovN3y6yfyLJ0yLVqvrvEEUaipZ3gf6mkuSqJ4oBOg0cEVNwwDs9PC6TH2U0u9kE4a3jEaugquiGg/pub?gid=2021575806&single=true&output=csv";
 
 let menuData = [];
 
@@ -410,7 +410,7 @@ function updateClock() {
   let hours = now.getHours(); const ampm = hours >= 12 ? 'PM' : 'AM'; hours = hours % 12 || 12;
   // RESTORED SECONDS: HH:MM:SS AM/PM
   document.getElementById('timePHT').textContent = `${hours.toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')} ${ampm}`;
-  // UPDATED DATE: Friday, March 13, 2026
+  // FIXED DATE FORMAT: Friday, March 13, 2026
   document.getElementById('datePHT').textContent = `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
 }
 setInterval(updateClock, 1000);
