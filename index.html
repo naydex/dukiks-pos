@@ -165,14 +165,14 @@ td { color: black; border-bottom: 1px solid #eee; }
     <div id="itemBreakdown" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;"></div>
   </div>
   <div style="overflow-x:auto;">
-    <table class="history-table">
+    <table class="history-table" id="mainHistoryTable">
       <thead>
         <tr><th>Copy</th><th>Receipt</th><th>Total</th><th>Status</th><th>Mode</th><th>Name</th><th>Address</th><th>Orders</th><th>Notes</th><th>Order#</th><th>Action</th></tr>
       </thead>
       <tbody id="historyBox"></tbody>
     </table>
   </div>
-  <button class="action-btn" id="copyTableBtn" style="margin-top: 30px;">⧉ Submit Sales Log</button>
+  <button class="action-btn" id="copyTableBtn" onclick="copyEntireTable(this)" style="margin-top: 30px;">⧉ Submit Sales Log</button>
 </div>
 
 <button class="action-btn" id="newDayBtn" onclick="startNewDay()">Start a New Day</button>
@@ -180,7 +180,7 @@ td { color: black; border-bottom: 1px solid #eee; }
 <script>
 // --- SHEET SYNC LOGIC ---
 const menuSheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRUovN3y6yfyLJ0yLVqvrvEEUaipZ3gf6mkuSqJ4oBOg0cEVNwwDs9PC6TH2U0u9kE4a3jEaugquiGg/pub?gid=159409582&single=true&output=csv";
-const communitySheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRUovN3y6yfyLJ0yLVqvrvEEUaipZ3gf6mkuSqJ4oBOg0cEVNwwDs9PC6TH2U0u9kE4a3jEaugquiGg/pub?gid=2021575806&single=true&output=csv";
+const communitySheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRUovN3y6yfyLJ0yLVqvrvEEUaipZ3gf6mkuSqJ4oBOg0cEVNwwDs9PC6TH2U0u9kE4a3jEaugquiGg/pub?gid=1695333389&single=true&output=csv";
 
 let menuData = [];
 
@@ -381,16 +381,29 @@ document.getElementById("startNewOrderBtn").onclick = function() {
   `;
   historyBox.appendChild(hRow);
   saveHistory();
-  copyOrderSummary(hRow.querySelector('button'));
-  localStorage.removeItem("dukiks_draft");
+  
+  const originalText = this.textContent;
   this.textContent = "✅ Logged!";
+  this.classList.add("success-state");
+  
+  localStorage.removeItem("dukiks_draft");
   setTimeout(() => { location.reload(); }, 800);
 };
+
+function showBtnConfirmation(btn, originalText) {
+  btn.textContent = "✅";
+  btn.classList.add("success-state");
+  setTimeout(() => {
+    btn.textContent = originalText;
+    btn.classList.remove("success-state");
+  }, 2000);
+}
 
 function copyOrderSummary(btn) {
   const row = btn.closest("tr");
   const summary = `${row.cells[9].innerText}\n${row.cells[11].innerText} ${row.cells[12].innerText}\nName: ${row.cells[5].innerText}\nAddress: ${row.cells[6].innerText}\n\nOrders:\n${row.cells[7].innerText.replace(/<br>/g, '\n')}\n\nNotes: ${row.cells[8].innerText}`;
   navigator.clipboard.writeText(summary);
+  showBtnConfirmation(btn, "Copy");
   window.location.href = "fb-messenger://user-thread/1629578618166443";
 }
 
@@ -398,6 +411,17 @@ function copyReceipt(btn) {
   const row = btn.closest("tr");
   const receipt = `${row.cells[7].innerText.replace(/<br>/g, '\n')}\nTotal: ₱${row.cells[2].innerText}`;
   navigator.clipboard.writeText(receipt);
+  showBtnConfirmation(btn, "Receipt");
+}
+
+function copyEntireTable(btn) {
+  let range = document.createRange();
+  range.selectNode(document.getElementById("mainHistoryTable"));
+  window.getSelection().removeAllRanges();
+  window.getSelection().addRange(range);
+  document.execCommand("copy");
+  window.getSelection().removeAllRanges();
+  showBtnConfirmation(btn, "⧉ Submit Sales Log");
 }
 
 function deleteRow(btn) { if(confirm("Delete?")) { btn.closest("tr").remove(); saveHistory(); } }
@@ -408,9 +432,7 @@ function updateClock() {
   const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   let hours = now.getHours(); const ampm = hours >= 12 ? 'PM' : 'AM'; hours = hours % 12 || 12;
-  // RESTORED SECONDS: HH:MM:SS AM/PM
   document.getElementById('timePHT').textContent = `${hours.toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')} ${ampm}`;
-  // FIXED DATE FORMAT: Friday, March 13, 2026
   document.getElementById('datePHT').textContent = `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
 }
 setInterval(updateClock, 1000);
