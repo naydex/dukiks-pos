@@ -441,9 +441,20 @@ function copyOrderSummary(btn) {
   const name = row.cells[5].innerText; const addr = row.cells[6].innerText; const total = row.cells[2].innerText;
   const notes = row.cells[8].innerText;
   const ordersRaw = row.cells[13].innerText;
+
+  let shortAddr = "";
+  if(addr.includes(" - Blk ")) {
+    const parts = addr.split(" - Blk ");
+    const commCode = parts[0].substring(0, 3).toUpperCase();
+    const subParts = parts[1].split(", Lot ");
+    shortAddr = `${commCode} ${subParts[0]}/${subParts[1]}`;
+  } else {
+    shortAddr = addr;
+  }
+
   const orderCodes = ordersRaw.split(", ");
   const fullOrderNames = orderCodes.map(item => { const parts = item.split("x "); const q = parts[0]; const c = parts[1]; const m = menuData.find(x => x.code === c); return `${q}x ${m ? m.menu : c}`; }).join("\n");
-  const summary = `${refNum}\n${dateStr} ${timeStr}\nName: ${name}\nAddress: ${addr}\n\n₱${total}\n\nOrders:\n${fullOrderNames}\n\nSpecial Notes: ${notes}`;
+  const summary = `${refNum}\n${dateStr} ${timeStr}\nName: ${name}\nAddress: ${addr}\n\n${shortAddr} ₱${total}\n\nOrders:\n${fullOrderNames}\n\nSpecial Notes: ${notes}`;
   navigator.clipboard.writeText(summary);
   window.location.href = "fb-messenger://user-thread/1629578618166443";
   setTimeout(() => { if (document.hasFocus()) { window.open("https://www.messenger.com/t/1629578618166443", "_blank"); } }, 500);
