@@ -19,7 +19,7 @@ h1 { text-align: center; font-weight: bold; font-size: 28px; color: white; margi
 .panel { max-width: 1000px; width: 100%; margin: 0 auto 40px auto; box-sizing: border-box; }
 #orderTable th { color: white !important; background-color: black; }
 table { border-collapse: collapse; border-radius: 10px; overflow: hidden; background: white; width: 100%; font-size: 14px; }
-th, td { padding: 8px 10px; text-align: left; }
+th, td { padding: 8px 10px; text-align: left; vertical-align: middle; }
 th { background-color: black; color: white !important; }
 td { color: black; border-bottom: 1px solid #eee; }
 .white-panel { background-color: white; padding: 15px; border-radius: 15px; }
@@ -45,13 +45,13 @@ td { color: black; border-bottom: 1px solid #eee; }
 #newDayBtn { background-color: #ff3b30; box-shadow: 0 6px #8b1a14; }
 #newDayBtn:hover { background-color: #d32f2f; }
 .del-btn { background: none; border: none; cursor: pointer; font-size: 20px; font-weight: bold; display: flex; align-items: center; justify-content: center; }
-.edit-btn { background: none; border: none; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; margin-right: 8px; }
+.edit-btn { background: none; border: none; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; margin-right: 5px; }
 .history-select { padding: 4px; border-radius: 4px; border: 1px solid #ccc; font-size: 12px; }
 .success-state { background-color: #4cd964 !important; box-shadow: 0 6px #38a84d !important; }
 .error-msg { color: #ff3b30; font-size: 14px; text-align: center; font-weight: bold; margin-bottom: 15px; display: none; }
 .history-panel { background-color: white; border-radius: 10px; padding: 15px; }
 .history-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
-.history-table th, .history-table td { border: 1px solid #ccc; padding: 6px; color: black; }
+.history-table th, .history-table td { border: 1px solid #ccc; padding: 6px; color: black; vertical-align: middle; }
 .history-table th { background-color: black; color: white !important; }
 .floating-datetime { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); background: rgba(0, 0, 0, 0.85); padding: 5px 15px; border-radius: 50px; text-align: center; z-index: 9999; color: white; width: 80%; }
 .digital-time { font-size: 20px; font-weight: bold; line-height: 1; }
@@ -211,7 +211,7 @@ async function fetchExternalData() {
         if (orderBody.children.length === 0) addOrderRow();
         updateTable();
         updateSummary();
-    } catch (e) { console.error("Fetch Error:", e); }
+    } catch (e) { console.error(e); }
 }
 const orderBody = document.getElementById("orderBody");
 const historyBox = document.getElementById("historyBox");
@@ -310,24 +310,24 @@ function updateSummary() {
     totalSales += parseFloat(priceText) || 0;
     const rawItems = row.cells[13].innerText;
     if (rawItems) {
-      const orderItems = rawItems.split(', ');
-      orderItems.forEach(itemStr => {
-        const parts = itemStr.split('x ');
-        if(parts.length > 1) {
-          const qty = parseInt(parts[0]) || 0;
-          const code = parts[1];
-          const menuItem = menuData.find(m => m.code === code);
-          if(menuItem) {
-            const name = menuItem.menu;
-            if (name.includes("Fried Chicken")) itemCounts["Fried Chicken"] += qty;
-            else if (name.includes("Pork Steak")) itemCounts["Pork Steak"] += qty;
-            else if (name.includes("Pork Chop")) itemCounts["Pork Chop"] += qty;
-            else if (name.includes("Vegetable Lumpia")) itemCounts["Vegetable Lumpia"] += qty;
-            else if (name.includes("Pork Lumpia")) itemCounts["Pork Lumpia"] += qty;
-            if (name.includes("with Rice") || name.includes("Extra Rice")) itemCounts["Rice"] += qty;
-          }
-        }
-      });
+        const orderItems = rawItems.split(', ');
+        orderItems.forEach(itemStr => {
+            const parts = itemStr.split('x ');
+            if(parts.length > 1) {
+                const qty = parseInt(parts[0]) || 0;
+                const code = parts[1];
+                const menuItem = menuData.find(m => m.code === code);
+                if(menuItem) {
+                    const name = menuItem.menu;
+                    if (name.includes("Fried Chicken")) itemCounts["Fried Chicken"] += qty;
+                    else if (name.includes("Pork Steak")) itemCounts["Pork Steak"] += qty;
+                    else if (name.includes("Pork Chop")) itemCounts["Pork Chop"] += qty;
+                    else if (name.includes("Vegetable Lumpia")) itemCounts["Vegetable Lumpia"] += qty;
+                    else if (name.includes("Pork Lumpia")) itemCounts["Pork Lumpia"] += qty;
+                    if (name.includes("with Rice") || name.includes("Extra Rice")) itemCounts["Rice"] += qty;
+                }
+            }
+        });
     }
   });
   document.getElementById("summaryTotalOrders").textContent = rows.length;
@@ -384,9 +384,11 @@ document.getElementById("startNewOrderBtn").onclick = function() {
     <td>${ordersPretty.join("<br>")}</td>
     <td>${notesInp.value || '-'}</td>
     <td style="font-weight:bold; color:#ff6b00;">${refNum}</td>
-    <td style="text-align:center; display: flex; align-items: center; justify-content: center;">
-      <button class="edit-btn" onclick="editOrder(this)">✏️</button>
-      <button class="del-btn" onclick="deleteRow(this)">🗑️</button>
+    <td style="text-align:center;">
+        <div style="display:flex; align-items:center; justify-content:center;">
+          <button class="edit-btn" onclick="editOrder(this)">✏️</button>
+          <button class="del-btn" onclick="deleteRow(this)">🗑️</button>
+        </div>
     </td>
     <th style="display:none">${month}/${day}/${year}</th>
     <th style="display:none">${hStr}:${mStr} ${ampm}</th>
