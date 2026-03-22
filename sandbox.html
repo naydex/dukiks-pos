@@ -218,7 +218,7 @@ const MENU_IN_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRUovN3y6yf
 const COMM_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRUovN3y6yfyLJ0yLVqvrvEEUaipZ3gf6mkuSqJ4oBOg0cEVNwwDs9PC6TH2U0u9kE4a3jEaugquiGg/pub?gid=1695333389&output=csv";
 const CREW_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRUovN3y6yfyLJ0yLVqvrvEEUaipZ3gf6mkuSqJ4oBOg0cEVNwwDs9PC6TH2U0u9kE4a3jEaugquiGg/pub?gid=1256574121&output=csv";
 
-let menuOnline = [], menuInstore = [], currentCrew = "", selectedType = "", onlineCart = [], instoreCart = [];
+let menuOnline = [], menuInstore = [], crewList = [], currentCrew = "", selectedType = "", onlineCart = [], instoreCart = [];
 
 async function init() {
     try {
@@ -251,7 +251,12 @@ async function init() {
         const crewG = document.getElementById("crewSelection");
         crw.split('\n').slice(1).forEach(r => {
             const c = r.split(',');
-            if(c[1]) crewG.innerHTML += `<div class="login-btn" style="background:#ff6b00; color:white; box-shadow: 0 6px #b34a00;" onclick="finalizeLogin('${c[1].trim()}')">${c[1].trim()}</div>`;
+            if(c[1]) {
+                const name = c[1].trim();
+                const pass = c[2] ? c[2].trim() : "";
+                crewList.push({name: name, password: pass});
+                crewG.innerHTML += `<div class="login-btn" style="background:#ff6b00; color:white; box-shadow: 0 6px #b34a00;" onclick="finalizeLogin('${name}')">${name}</div>`;
+            }
         });
 
         const s1 = localStorage.getItem("dukiks_history"); if(s1) { document.getElementById("historyBox").innerHTML = s1; restoreSelects("historyBox"); }
@@ -271,8 +276,11 @@ function setPosType(type) {
 
 function finalizeLogin(name) {
     if(!selectedType) { alert("Please select POS Type first!"); return; }
-    const pass = prompt("Enter Password for " + name + ":");
-    if(pass !== "dukiks2026") { alert("Incorrect Password!"); return; }
+    const crew = crewList.find(c => c.name === name);
+    if(crew && crew.password) {
+        const pass = prompt("Enter Password for " + name + ":");
+        if(pass !== crew.password) { alert("Incorrect Password!"); return; }
+    }
     currentCrew = name;
     localStorage.setItem("dukiks_session", JSON.stringify({crew: name, type: selectedType}));
     showMain(name, selectedType);
