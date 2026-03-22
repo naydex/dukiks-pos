@@ -59,27 +59,22 @@ td { color: black; border-bottom: 1px solid #eee; }
 .required-star { color: #ff3b30; font-size: 12px; margin-left: 4px; }
 .error-bump { border: 2px solid #ff3b30 !important; animation: shake 0.4s ease-in-out; }
 @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-5px); } }
-.tab-container { position: fixed; top: 65px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; z-index: 9998; width: 90%; max-width: 500px; }
-.tab-btn { flex: 1; padding: 10px; border: none; background: #333; color: white; font-weight: bold; border-radius: 10px 10px 0 0; cursor: pointer; }
-.tab-btn.active { background: white; color: black; }
-.tab-content { display: none; }
-.tab-content.active { display: block; }
-.login-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-.login-btn { background: #eee; padding: 20px; border-radius: 12px; text-align: center; cursor: pointer; font-weight: bold; border: 2px solid #ccc; }
-.login-btn:hover { background: #ddd; }
 .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px; }
 .category-title { grid-column: 1 / -1; background: #000; color: #ff6b00; padding: 5px 15px; border-radius: 8px; font-size: 14px; font-weight: bold; margin-top: 10px; }
 .prod-btn { background: #ff6b00; border: none; color: white; padding: 15px 10px; border-radius: 12px; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; box-shadow: 0 5px #b34a00; transition: all 0.1s; position: relative; top: 0; }
 .prod-btn:active { top: 3px; box-shadow: 0 2px #b34a00; }
 .prod-btn span { font-size: 10px; color: #fff; margin-top: 5px; opacity: 0.8; }
-.calculator-box { background: #f0f0f0; padding: 15px; border-radius: 12px; margin-top: 20px; border: 1px solid #ccc; transition: background 0.3s; }
+.calculator-box { background: #f0f0f0; padding: 15px; border-radius: 12px; margin-top: 20px; border: 1px solid #ccc; }
 .calc-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 18px; font-weight: bold; }
 .change-amt { color: #28a745; font-size: 24px; }
 .change-warning { color: #ff3b30 !important; }
-.calc-error { background: #ffebeb; border: 2px solid #ff3b30; }
+.login-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+.login-btn { background: #ff6b00; padding: 25px; border-radius: 15px; text-align: center; cursor: pointer; font-weight: bold; color: white; border: none; box-shadow: 0 6px #b34a00; font-size: 18px; transition: all 0.1s; position: relative; }
+.login-btn:active { top: 3px; box-shadow: 0 2px #b34a00; }
+.login-btn.pos-choice { background: #000; box-shadow: 0 6px #333; }
+.login-btn.pos-choice:active { box-shadow: 0 2px #333; }
+.login-btn.selected { background: #4cd964; box-shadow: 0 6px #38a84d; }
 .crew-timestamp { text-align: center; color: white; font-size: 13px; margin-top: 5px; margin-bottom: 15px; }
-.social-links { font-size: 12px; margin-top: 10px; }
-.social-links a { color: white; text-decoration: underline; margin: 0 10px; }
 </style>
 </head>
 <body>
@@ -88,32 +83,25 @@ td { color: black; border-bottom: 1px solid #eee; }
   <div class="date-display" id="datePHT"></div>
 </div>
 
-<div id="loginScreenGlobal" class="panel white-panel" style="margin-top: 100px;">
-    <h2>Authorized Personnel Only</h2>
-    <div id="crewButtonsGlobal" class="login-grid">Loading Crew...</div>
+<div id="loginScreen" class="panel white-panel" style="margin-top: 100px;">
+    <h2 id="loginTitle">Select POS Type</h2>
+    <div id="posSelection" class="login-grid">
+        <div class="login-btn pos-choice" onclick="selectPOS('online')">ONLINE POS</div>
+        <div class="login-btn pos-choice" onclick="selectPOS('instore')">IN-STORE POS</div>
+    </div>
+    <div id="crewSelection" class="login-grid" style="display:none;"></div>
 </div>
 
-<div id="mainPOS" style="display:none;">
-    <div class="tab-container">
-      <button class="tab-btn active" id="onlineTabBtn" onclick="switchTab('online')">Online POS</button>
-      <button class="tab-btn" id="instoreTabBtn" onclick="switchTab('instore')">In-Store POS</button>
-    </div>
-
+<div id="mainContainer" style="display:none;">
     <div class="logo-container">
       <img src="dukiks-logo.png" alt="Dukiks Logo">
     </div>
-    <h1>Dukik's Hungry Hub</h1>
-    <div id="crewHeaderDisplay" class="crew-timestamp">Logged in: - at -</div>
+    <h1 id="posHeaderTitle">Dukik's Hungry Hub</h1>
+    <div id="crewHeaderDisplay" class="crew-timestamp"></div>
 
-    <div id="onlineTab" class="tab-content active">
-      <div class="subtitle">Order Intake Form</div>
-      <div class="panel">
-        <table id="menuReferenceTable">
-          <thead><tr><th>Type</th><th>Menu</th><th>Code</th><th>Price</th></tr></thead>
-          <tbody id="menuReferenceBody"></tbody>
-        </table>
-      </div>
-      <div class="panel white-panel" id="intakePanel">
+    <div id="onlinePOS" style="display:none;">
+      <div class="subtitle">Order Intake Form (Online)</div>
+      <div class="panel white-panel">
         <h2>Order Intake</h2>
         <div id="validationError" class="error-msg">⚠️ Please check Name, Address, and Items!</div>
         <div class="input-row">
@@ -127,30 +115,21 @@ td { color: black; border-bottom: 1px solid #eee; }
           </select>
         </div>
         <div id="subdivisionGroup" class="hidden-field side-by-side">
-          <div class="input-row">
-            <label>BLK/Floor <span class="required-star">*</span></label>
-            <input type="text" id="blockFloor" class="small-input" placeholder="000" oninput="this.value = this.value.replace(/[^0-9]/g, '').substring(0,4);">
-          </div>
-          <div class="input-row">
-            <label>Lot/Room <span class="required-star">*</span></label>
-            <input type="text" id="lotRoom" class="small-input" placeholder="000" oninput="this.value = this.value.replace(/[^0-9]/g, '').substring(0,4);">
-          </div>
+          <div class="input-row"><label>BLK/Floor <span class="required-star">*</span></label><input type="text" id="blockFloor" class="small-input" placeholder="000" oninput="this.value = this.value.replace(/[^0-9]/g, '').substring(0,4);"></div>
+          <div class="input-row"><label>Lot/Room <span class="required-star">*</span></label><input type="text" id="lotRoom" class="small-input" placeholder="000" oninput="this.value = this.value.replace(/[^0-9]/g, '').substring(0,4);"></div>
         </div>
         <div id="homeAddressGroup">
-          <div class="input-row">
-            <label>Home Address <span class="required-star">*</span></label>
-            <input type="text" id="customerAddress" placeholder="Street / Barangay / Landmark">
-          </div>
+          <div class="input-row"><label>Home Address <span class="required-star">*</span></label><input type="text" id="customerAddress" placeholder="Street / Barangay / Landmark"></div>
         </div>
-        <table class="order-table" id="orderTable">
+
+        <div id="onlineProductButtons" class="product-grid" style="margin-top:20px;"></div>
+
+        <table class="order-table">
           <thead><tr><th>Order <span class="required-star">*</span></th><th>Qty</th><th>Price</th></tr></thead>
-          <tbody id="orderBody"></tbody>
+          <tbody id="onlineOrderBody"></tbody>
         </table>
-        <div class="input-row">
-          <label>Notes</label>
-          <input type="text" id="specialInstructions" placeholder="Special Instructions">
-        </div>
-        <button class="action-btn" id="startNewOrderBtn">Log Order & Clear</button>
+        <div class="input-row"><label>Notes</label><input type="text" id="specialInstructions" placeholder="Special Instructions"></div>
+        <button class="action-btn" id="logOnlineBtn" onclick="logOnlineOrder()">Log Order & Clear</button>
       </div>
 
       <div class="panel history-panel">
@@ -166,24 +145,23 @@ td { color: black; border-bottom: 1px solid #eee; }
           </div>
           <div style="overflow-x:auto;">
             <table class="history-table">
-              <thead><tr><th>Copy</th><th>Receipt</th><th>Crew</th><th>Total</th><th>Status</th><th>Mode</th><th>Name</th><th>Address</th><th>Orders</th><th>Notes</th><th>Order#</th><th>Action</th><th style="display:none">D</th><th style="display:none">T</th><th style="display:none">R</th></tr></thead>
+              <thead><tr><th>Copy</th><th>Receipt</th><th>Total</th><th>Status</th><th>Mode</th><th>Name</th><th>Address</th><th>Orders</th><th>Notes</th><th>Order#</th><th>Action</th><th style="display:none">D</th><th style="display:none">T</th><th style="display:none">R</th><th style="display:none">Crew</th></tr></thead>
               <tbody id="historyBox"></tbody>
             </table>
           </div>
+          <button class="action-btn" id="onlineSubmitSalesBtn" onclick="submitSalesLog('online')">⧉ Submit Sales Log</button>
       </div>
     </div>
 
-    <div id="instoreTab" class="tab-content">
+    <div id="instorePOS" style="display:none;">
+        <div class="subtitle">Dukik's In-Store Checkout</div>
         <div class="panel white-panel">
             <div id="instoreProductButtons" class="product-grid"></div>
             <table class="order-table">
                 <thead><tr><th>Item</th><th>Qty</th><th>Total</th></tr></thead>
                 <tbody id="instoreOrderBody"></tbody>
             </table>
-            <div class="input-row">
-              <label>Notes</label>
-              <input type="text" id="instoreNotes" placeholder="Additional notes for this sale">
-            </div>
+            <div class="input-row"><label>Notes</label><input type="text" id="instoreNotes" placeholder="Additional notes for this sale"></div>
             <div class="calculator-box" id="calcBox">
                 <div class="calc-row"><span>Grand Total:</span><span id="instoreGrandTotal">0.00</span></div>
                 <div class="calc-row"><span>Cash Received: <span class="required-star">*</span></span><input type="number" id="cashReceived" style="width:120px;" oninput="calculateChange()"></div>
@@ -205,501 +183,280 @@ td { color: black; border-bottom: 1px solid #eee; }
             </div>
             <div style="overflow-x:auto;">
               <table class="history-table">
-                <thead><tr><th>Receipt</th><th>Crew</th><th>Total</th><th>Received</th><th>Change</th><th>Status</th><th>Mode</th><th>Orders</th><th>Notes</th><th>Order#</th><th>Action</th><th style="display:none">Name</th><th style="display:none">Addr</th><th style="display:none">D</th><th style="display:none">T</th><th style="display:none">R</th></tr></thead>
+                <thead><tr><th>Receipt</th><th>Crew</th><th>Total</th><th>Received</th><th>Change</th><th>Orders</th><th>Notes</th><th>Order#</th><th>Action</th><th style="display:none">Name</th><th style="display:none">Addr</th><th style="display:none">D</th><th style="display:none">T</th><th style="display:none">R</th><th style="display:none">Status</th><th style="display:none">Mode</th></tr></thead>
                 <tbody id="instoreHistoryBox"></tbody>
               </table>
             </div>
+            <button class="action-btn" id="instoreSubmitSalesBtn" onclick="submitSalesLog('instore')">⧉ Submit Sales Log</button>
         </div>
     </div>
 
-    <div class="panel history-panel">
-        <button class="action-btn" id="copyTableBtn" style="margin-top: 30px;">⧉ Submit Sales Log</button>
+    <div class="panel">
         <button class="action-btn" id="newDayBtn" onclick="startNewDay()">Start a New Day</button>
-        <button class="action-btn" style="background:#444; box-shadow: 0 6px #222;" onclick="logoutGlobal()">Switch Crew / Logout</button>
-    </div>
-
-    <div style="text-align: center; color: white; margin: 40px 0 20px 0;">
-      <div style="font-size: 16px; font-weight: bold; margin-bottom: 5px;">𝐃𝐮𝐤𝐢𝐤‘𝐬 𝐇𝐮𝐧𝐠𝐫𝐲 𝐇𝐮𝐛</div>
-      <div style="font-size: 12px; margin-bottom: 10px;">contact@naydexph.com</div>
-      <div class="social-links">
-          <a href="https://www.facebook.com/dukikshungryhub" target="_blank">Facebook</a>
-          <a href="https://www.instagram.com/dukikshungryhub" target="_blank">Instagram</a>
-      </div>
+        <button class="action-btn" style="background:#444; box-shadow: 0 6px #222;" onclick="location.reload()">Switch Crew / Logout</button>
     </div>
 </div>
 
 <script>
-const MENU_ONLINE_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRUovN3y6yfyLJ0yLVqvrvEEUaipZ3gf6mkuSqJ4oBOg0cEVNwwDs9PC6TH2U0u9kE4a3jEaugquiGg/pub?gid=159409582&output=csv";
-const MENU_INSTORE_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRUovN3y6yfyLJ0yLVqvrvEEUaipZ3gf6mkuSqJ4oBOg0cEVNwwDs9PC6TH2U0u9kE4a3jEaugquiGg/pub?gid=1821850012&output=csv";
+const MENU_ON_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRUovN3y6yfyLJ0yLVqvrvEEUaipZ3gf6mkuSqJ4oBOg0cEVNwwDs9PC6TH2U0u9kE4a3jEaugquiGg/pub?gid=159409582&output=csv";
+const MENU_IN_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRUovN3y6yfyLJ0yLVqvrvEEUaipZ3gf6mkuSqJ4oBOg0cEVNwwDs9PC6TH2U0u9kE4a3jEaugquiGg/pub?gid=1821850012&output=csv";
 const COMM_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRUovN3y6yfyLJ0yLVqvrvEEUaipZ3gf6mkuSqJ4oBOg0cEVNwwDs9PC6TH2U0u9kE4a3jEaugquiGg/pub?gid=1695333389&output=csv";
 const CREW_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRUovN3y6yfyLJ0yLVqvrvEEUaipZ3gf6mkuSqJ4oBOg0cEVNwwDs9PC6TH2U0u9kE4a3jEaugquiGg/pub?gid=1256574121&output=csv";
 
-let menuOnline = [];
-let menuInstore = [];
-let instoreCart = [];
-let currentCrew = "";
+let menuOnline = [], menuInstore = [], currentCrew = "", selectedType = "", onlineCart = [], instoreCart = [];
 
-async function fetchData() {
+async function init() {
     try {
-        const [mo, mi, co, cr] = await Promise.all([
-            fetch(MENU_ONLINE_URL).then(r => r.text()),
-            fetch(MENU_INSTORE_URL).then(r => r.text()),
+        const [on, ins, com, crw] = await Promise.all([
+            fetch(MENU_ON_URL).then(r => r.text()),
+            fetch(MENU_IN_URL).then(r => r.text()),
             fetch(COMM_URL).then(r => r.text()),
             fetch(CREW_URL).then(r => r.text())
         ]);
 
-        const refBody = document.getElementById("menuReferenceBody");
-        refBody.innerHTML = "";
-        menuOnline = mo.split('\n').slice(1).map(row => {
-            const cols = row.split(',');
-            if(cols.length < 4) return null;
-            const item = { type: cols[0].trim(), menu: cols[1].trim(), code: cols[2].trim(), price: parseFloat(cols[3]) };
-            refBody.innerHTML += `<tr><td>${item.type}</td><td>${item.menu}</td><td>${item.code}</td><td>${item.price.toFixed(2)}</td></tr>`;
-            return item;
-        }).filter(x => x);
+        menuOnline = on.split('\n').slice(1).map(r => { const c = r.split(','); return c.length >= 4 ? {type: c[0].trim(), menu: c[1].trim(), code: c[2].trim(), price: parseFloat(c[3])} : null; }).filter(x => x);
+        menuInstore = ins.split('\n').slice(1).map(r => { const c = r.split(','); return c.length >= 4 ? {type: c[0].trim(), menu: c[1].trim(), code: c[2].trim(), price: parseFloat(c[3])} : null; }).filter(x => x);
 
-        const inGrid = document.getElementById("instoreProductButtons");
-        inGrid.innerHTML = "";
-        menuInstore = mi.split('\n').slice(1).map(row => {
-            const cols = row.split(',');
-            if(cols.length < 4) return null;
-            return { type: cols[0].trim(), menu: cols[1].trim(), code: cols[2].trim(), price: parseFloat(cols[3]) };
-        }).filter(x => x);
-
-        const categories = [...new Set(menuInstore.map(item => item.type))];
-        categories.forEach(cat => {
-            inGrid.innerHTML += `<div class="category-title">${cat.toUpperCase()}</div>`;
-            menuInstore.filter(i => i.type === cat).forEach(item => {
-                inGrid.innerHTML += `<button class="prod-btn" onclick="addToInstoreCart('${item.code}')">${item.menu}<span>₱${item.price.toFixed(2)}</span></button>`;
+        const buildGrid = (data, targetId, cartName) => {
+            const grid = document.getElementById(targetId);
+            const cats = [...new Set(data.map(i => i.type))];
+            cats.forEach(cat => {
+                grid.innerHTML += `<div class="category-title">${cat.toUpperCase()}</div>`;
+                data.filter(i => i.type === cat).forEach(i => {
+                    grid.innerHTML += `<button class="prod-btn" onclick="addToCart('${cartName}', '${i.code}')">${i.menu}<span>₱${i.price.toFixed(2)}</span></button>`;
+                });
             });
+        };
+        buildGrid(menuOnline, "onlineProductButtons", "online");
+        buildGrid(menuInstore, "instoreProductButtons", "instore");
+
+        const commS = document.getElementById("communitySelect");
+        com.split('\n').slice(1).forEach(r => { if(r.trim()) commS.innerHTML += `<option value="${r.trim()}">${r.trim()}</option>`; });
+
+        const crewG = document.getElementById("crewSelection");
+        crw.split('\n').slice(1).forEach(r => {
+            const c = r.split(',');
+            if(c[1]) crewG.innerHTML += `<div class="login-btn" style="background:#ff6b00; color:white; box-shadow: 0 6px #b34a00;" onclick="finalizeLogin('${c[1].trim()}')">${c[1].trim()}</div>`;
         });
 
-        const commSelect = document.getElementById("communitySelect");
-        commSelect.innerHTML = '<option value="Home">Home Address (Not a Subdivision)</option>';
-        co.split('\n').slice(1).forEach(row => { if(row.trim()) commSelect.innerHTML += `<option value="${row.trim()}">${row.trim()}</option>`; });
-
-        const crewGrid = document.getElementById("crewButtonsGlobal");
-        crewGrid.innerHTML = "";
-        cr.split('\n').slice(1).forEach(row => {
-            const cols = row.split(',');
-            if(cols[1]) {
-                const name = cols[1].trim();
-                crewGrid.innerHTML += `<div class="login-btn" onclick="loginGlobal('${name}')">${name}</div>`;
-            }
-        });
-
-        if (orderBody.children.length === 0) addOrderRow();
-        updateTable();
+        const s1 = localStorage.getItem("dukiks_history"); if(s1) { document.getElementById("historyBox").innerHTML = s1; restoreSelects("historyBox"); }
+        const s2 = localStorage.getItem("dukiks_history_in"); if(s2) { document.getElementById("instoreHistoryBox").innerHTML = s2; restoreSelects("instoreHistoryBox"); }
         updateSummary();
     } catch (e) { console.error(e); }
 }
 
-function loginGlobal(name) {
+function selectPOS(type) {
+    selectedType = type;
+    document.getElementById("posSelection").style.display = "none";
+    document.getElementById("loginTitle").textContent = "Select Employee Name";
+    document.getElementById("crewSelection").style.display = "grid";
+}
+
+function finalizeLogin(name) {
     currentCrew = name;
+    document.getElementById("loginScreen").style.display = "none";
+    document.getElementById("mainContainer").style.display = "block";
+    document.getElementById(selectedType + "POS").style.display = "block";
     const now = new Date();
-    const fullDate = now.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'});
-    const fullTime = now.toLocaleTimeString();
-    document.getElementById("crewHeaderDisplay").textContent = `Logged in: ${name} at ${fullDate} ${fullTime}`;
-    document.getElementById("loginScreenGlobal").style.display = "none";
-    document.getElementById("mainPOS").style.display = "block";
+    document.getElementById("crewHeaderDisplay").textContent = `Logged in: ${name} | ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`;
 }
 
-function logoutGlobal() {
-    if(confirm("Are you sure you want to logout?")) {
-        currentCrew = "";
-        document.getElementById("loginScreenGlobal").style.display = "block";
-        document.getElementById("mainPOS").style.display = "none";
-    }
+function addToCart(type, code) {
+    const cart = type === 'online' ? onlineCart : instoreCart;
+    const item = cart.find(i => i.code === code);
+    if(item) item.qty++; else cart.push({code: code, qty: 1});
+    renderCart(type);
 }
 
-function switchTab(tab) {
-    document.getElementById('onlineTab').classList.remove('active');
-    document.getElementById('instoreTab').classList.remove('active');
-    document.getElementById('onlineTabBtn').classList.remove('active');
-    document.getElementById('instoreTabBtn').classList.remove('active');
-    
-    if(tab === 'online') {
-        document.getElementById('onlineTab').classList.add('active');
-        document.getElementById('onlineTabBtn').classList.add('active');
-    } else {
-        document.getElementById('instoreTab').classList.add('active');
-        document.getElementById('instoreTabBtn').classList.add('active');
-    }
-}
-
-function addToInstoreCart(code) {
-    const existing = instoreCart.find(i => i.code === code);
-    if(existing) existing.qty++;
-    else instoreCart.push({code: code, qty: 1});
-    renderInstoreTable();
-}
-
-function renderInstoreTable() {
-    const body = document.getElementById("instoreOrderBody");
+function renderCart(type) {
+    const cart = type === 'online' ? onlineCart : instoreCart;
+    const body = document.getElementById(type + "OrderBody");
+    const menu = type === 'online' ? menuOnline : menuInstore;
     body.innerHTML = "";
     let grand = 0;
-    instoreCart.forEach((item, index) => {
-        const m = menuInstore.find(x => x.code === item.code);
+    cart.forEach((item, idx) => {
+        const m = menu.find(x => x.code === item.code);
         const total = m.price * item.qty;
         grand += total;
-        body.innerHTML += `<tr><td>${m.menu}</td><td><input type="number" value="${item.qty}" min="0" style="width:50px" onchange="updateInstoreQty(${index}, this.value)"></td><td>${formatPHP(total)}</td></tr>`;
+        body.innerHTML += `<tr><td>${m.menu}</td><td><input type="number" value="${item.qty}" min="0" style="width:50px" onchange="updateQty('${type}', ${idx}, this.value)"></td><td>${formatPHP(total)}</td></tr>`;
     });
-    document.getElementById("instoreGrandTotal").textContent = formatPHP(grand);
-    calculateChange();
+    if(type === 'instore') {
+        document.getElementById("instoreGrandTotal").textContent = formatPHP(grand);
+        calculateChange();
+    } else {
+        const oldGT = document.getElementById("onlineGrandTotalRow"); if(oldGT) oldGT.remove();
+        const tr = document.createElement("tr"); tr.id = "onlineGrandTotalRow";
+        tr.innerHTML = `<td colspan="2" style="text-align:right; font-weight:bold;">Grand Total:</td><td style="color:red; font-weight:bold;">${formatPHP(grand)}</td>`;
+        body.appendChild(tr);
+    }
 }
 
-function updateInstoreQty(index, val) {
-    if(parseInt(val) <= 0) instoreCart.splice(index, 1);
-    else instoreCart[index].qty = parseInt(val);
-    renderInstoreTable();
+function updateQty(type, idx, val) {
+    const cart = type === 'online' ? onlineCart : instoreCart;
+    if(parseInt(val) <= 0) cart.splice(idx, 1); else cart[idx].qty = parseInt(val);
+    renderCart(type);
+}
+
+function logOnlineOrder() {
+    const name = document.getElementById("customerName");
+    const comm = document.getElementById("communitySelect");
+    const blk = document.getElementById("blockFloor");
+    const lot = document.getElementById("lotRoom");
+    const addr = document.getElementById("customerAddress");
+    let valid = true;
+    if(!name.value.trim()) { name.classList.add("error-bump"); valid = false; }
+    if(comm.value === "Home") { if(!addr.value.trim()) { addr.classList.add("error-bump"); valid = false; } }
+    else { if(!blk.value.trim()) { blk.classList.add("error-bump"); valid = false; } if(!lot.value.trim()) { lot.classList.add("error-bump"); valid = false; } }
+    if(!valid || onlineCart.length === 0) { document.getElementById("validationError").style.display = "block"; return; }
+
+    const now = new Date();
+    const dStr = `${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getDate().toString().padStart(2,'0')}/${now.getFullYear()}`;
+    const tStr = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    const ref = dStr.replace(/\//g,'') + "-" + tStr.replace(/[: ]/g,'');
+    const fullAddr = (comm.value === "Home") ? addr.value : `${comm.value} - Blk ${blk.value}, Lot ${lot.value}`;
+    
+    let codes = [], pretty = [], total = 0;
+    onlineCart.forEach(i => { const m = menuOnline.find(x => x.code === i.code); codes.push(`${i.qty}x ${m.code}`); pretty.push(`${i.qty}x ${m.menu}`); total += m.price * i.qty; });
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td><button class="action-btn" style="width:auto; padding:5px 10px; margin:0; font-size:11px;" onclick="copySummary(this, false)">Copy</button></td>
+        <td><button class="action-btn" style="width:auto; padding:5px 10px; margin:0; font-size:11px; background-color:#007bff;" onclick="copyReceipt(this, false)">Receipt</button></td>
+        <td style="font-weight:bold;">${formatPHP(total)}</td>
+        <td><select class="history-select" data-val="Unpaid" onchange="saveHistory()"><option>Unpaid</option><option>Paid</option></select></td>
+        <td><select class="history-select" data-val="GCash" onchange="saveHistory()"><option>GCash</option><option>Cash</option></select></td>
+        <td>${name.value}</td><td>${fullAddr}</td><td>${pretty.join("<br>")}</td><td>${document.getElementById("specialInstructions").value || '-'}</td><td style="font-weight:bold; color:#ff6b00;">${ref}</td>
+        <td><div style="display:flex;"><button class="edit-btn" onclick="editOrder(this, false)">✏️</button><button class="del-btn" onclick="deleteRow(this)">🗑️</button></div></td>
+        <th style="display:none">${dStr}</th><th style="display:none">${tStr}</th><th style="display:none">${codes.join(", ")}</th><th style="display:none">${currentCrew}</th>`;
+    document.getElementById("historyBox").appendChild(tr);
+    saveHistory();
+    onlineCart = []; renderCart('online');
+    name.value = ""; blk.value = ""; lot.value = ""; addr.value = ""; document.getElementById("specialInstructions").value = "";
+    document.getElementById("logOnlineBtn").textContent = "✅ Logged!";
+    setTimeout(() => document.getElementById("logOnlineBtn").textContent = "Log Order & Clear", 1500);
 }
 
 function calculateChange() {
     const total = parseFloat(document.getElementById("instoreGrandTotal").textContent.replace(/,/g, ''));
-    const cashInp = document.getElementById("cashReceived");
-    const received = parseFloat(cashInp.value) || 0;
+    const received = parseFloat(document.getElementById("cashReceived").value) || 0;
     const change = received - total;
     const disp = document.getElementById("changeDue");
-    const box = document.getElementById("calcBox");
-    
     disp.textContent = formatPHP(change);
-    if (change < 0) {
-        disp.classList.add("change-warning");
-        box.classList.add("calc-error");
-        box.classList.add("error-bump");
-    } else {
-        disp.classList.remove("change-warning");
-        box.classList.remove("calc-error");
-        box.classList.remove("error-bump");
-    }
+    disp.className = change < 0 ? "change-amt change-warning" : "change-amt";
     return change;
 }
 
 function logInstoreOrder() {
-    const cashInp = document.getElementById("cashReceived");
-    if(!cashInp.value) { cashInp.classList.add("error-bump"); return; }
+    const cash = document.getElementById("cashReceived");
+    if(calculateChange() < 0 || instoreCart.length === 0) { cash.classList.add("error-bump"); return; }
     
-    const currentChange = calculateChange();
-    if(currentChange < 0) {
-        cashInp.classList.add("error-bump");
-        return;
-    }
-    
-    if(instoreCart.length === 0) return alert("Empty Cart!");
-    
-    let codes = []; let pretty = []; let total = 0;
-    instoreCart.forEach(i => {
-        const m = menuInstore.find(x => x.code === i.code);
-        codes.push(`${i.qty}x ${m.code}`);
-        pretty.push(`${i.qty}x ${m.menu}`);
-        total += m.price * i.qty;
-    });
-
     const now = new Date();
     const dStr = `${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getDate().toString().padStart(2,'0')}/${now.getFullYear()}`;
-    let h = now.getHours(); const ampm = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12;
-    const tStr = `${h.toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')} ${ampm}`;
+    const tStr = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
     const ref = dStr.replace(/\//g,'') + "-" + tStr.replace(/[: ]/g,'');
-    const noteVal = document.getElementById("instoreNotes").value;
-    const received = parseFloat(cashInp.value) || 0;
+    
+    let codes = [], pretty = [], total = 0;
+    instoreCart.forEach(i => { const m = menuInstore.find(x => x.code === i.code); codes.push(`${i.qty}x ${m.code}`); pretty.push(`${i.qty}x ${m.menu}`); total += m.price * i.qty; });
 
-    const hRow = document.createElement("tr");
-    hRow.innerHTML = `
-        <td><button class="action-btn" style="width:auto; padding:5px 10px; margin:0; font-size:11px; background-color:#007bff;" onclick="copyReceipt(this, true)">Receipt</button></td>
-        <td>${currentCrew}</td>
-        <td style="font-weight:bold;">${formatPHP(total)}</td>
-        <td>${formatPHP(received)}</td>
-        <td>${formatPHP(currentChange)}</td>
-        <td><select class="history-select" data-val="Paid" onchange="saveHistory()"><option>Unpaid</option><option selected>Paid</option></select></td>
-        <td><select class="history-select" data-val="Cash" onchange="saveHistory()"><option>GCash</option><option selected>Cash</option></select></td>
-        <td>${pretty.join("<br>")}</td>
-        <td>${noteVal || '-'}</td>
-        <td style="font-weight:bold; color:#ff6b00;">${ref}</td>
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td><button class="action-btn" style="width:auto; padding:5px 10px; margin:0; font-size:11px; background-color:#007bff;" onclick="copyReceipt(this, true)">Receipt</button></td>
+        <td>${currentCrew}</td><td style="font-weight:bold;">${formatPHP(total)}</td><td>${formatPHP(parseFloat(cash.value))}</td><td>${formatPHP(calculateChange())}</td>
+        <td>${pretty.join("<br>")}</td><td>${document.getElementById("instoreNotes").value || '-'}</td><td style="font-weight:bold; color:#ff6b00;">${ref}</td>
         <td><div style="display:flex;"><button class="edit-btn" onclick="editOrder(this, true)">✏️</button><button class="del-btn" onclick="deleteRow(this)">🗑️</button></div></td>
-        <th style="display:none">In-store</th><th style="display:none">In-store</th><th style="display:none">${dStr}</th><th style="display:none">${tStr}</th><th style="display:none">${codes.join(", ")}</th>
-    `;
-    document.getElementById("instoreHistoryBox").appendChild(hRow);
+        <th style="display:none">In-store</th><th style="display:none">In-store</th><th style="display:none">${dStr}</th><th style="display:none">${tStr}</th><th style="display:none">${codes.join(", ")}</th><th style="display:none">Paid</th><th style="display:none">Cash</th>`;
+    document.getElementById("instoreHistoryBox").appendChild(tr);
     saveHistory();
-    instoreCart = [];
-    cashInp.value = "";
-    document.getElementById("instoreNotes").value = "";
-    cashInp.classList.remove("error-bump");
-    renderInstoreTable();
-    const btn = document.getElementById("logInstoreBtn");
-    btn.textContent = "✅ Logged!";
-    btn.classList.add("success-state");
-    setTimeout(() => { btn.textContent = "Log Order & Clear"; btn.classList.remove("success-state"); }, 1500);
-}
-
-const orderBody = document.getElementById("orderBody");
-const historyBox = document.getElementById("historyBox");
-const inHistoryBox = document.getElementById("instoreHistoryBox");
-const nameInp = document.getElementById("customerName");
-const commInp = document.getElementById("communitySelect");
-const blkInp = document.getElementById("blockFloor");
-const lotInp = document.getElementById("lotRoom");
-const addrInp = document.getElementById("customerAddress");
-const notesInp = document.getElementById("specialInstructions");
-
-window.onload = () => {
-    const s1 = localStorage.getItem("dukiks_history");
-    if(s1) { historyBox.innerHTML = s1; restoreSelects(historyBox); }
-    const s2 = localStorage.getItem("dukiks_history_in");
-    if(s2) { inHistoryBox.innerHTML = s2; restoreSelects(inHistoryBox); }
-    fetchData();
-    updateClock();
-};
-
-function restoreSelects(container) {
-    container.querySelectorAll('tr').forEach(row => {
-        row.querySelectorAll('select').forEach(sel => {
-            sel.value = sel.getAttribute('data-val');
-            sel.onchange = saveHistory;
-        });
-    });
+    instoreCart = []; renderCart('instore');
+    cash.value = ""; document.getElementById("instoreNotes").value = "";
+    document.getElementById("logInstoreBtn").textContent = "✅ Logged!";
+    setTimeout(() => document.getElementById("logInstoreBtn").textContent = "Log Order & Clear", 1500);
 }
 
 function saveHistory() {
     document.querySelectorAll('select.history-select').forEach(s => s.setAttribute('data-val', s.value));
-    localStorage.setItem("dukiks_history", historyBox.innerHTML);
-    localStorage.setItem("dukiks_history_in", inHistoryBox.innerHTML);
+    localStorage.setItem("dukiks_history", document.getElementById("historyBox").innerHTML);
+    localStorage.setItem("dukiks_history_in", document.getElementById("instoreHistoryBox").innerHTML);
     updateSummary();
 }
 
 function updateSummary() {
-    let itemCountsOnline = { "Fried Chicken": 0, "Pork Steak": 0, "Pork Chop": 0, "Vegetable Lumpia": 0, "Pork Lumpia": 0, "Rice": 0 };
-    historyBox.querySelectorAll("tr").forEach(row => {
-        const rawItems = row.cells[14].innerText;
-        if (rawItems) {
-            rawItems.split(', ').forEach(itemStr => {
-                const parts = itemStr.split('x ');
-                if(parts.length > 1) {
-                    const qty = parseInt(parts[0]) || 0;
-                    const menuItem = menuOnline.find(m => m.code === parts[1]);
-                    if(menuItem) {
-                        const name = menuItem.menu;
-                        if (name.includes("Fried Chicken")) itemCountsOnline["Fried Chicken"] += qty;
-                        else if (name.includes("Pork Steak")) itemCountsOnline["Pork Steak"] += qty;
-                        else if (name.includes("Pork Chop")) itemCountsOnline["Pork Chop"] += qty;
-                        else if (name.includes("Vegetable Lumpia")) itemCountsOnline["Vegetable Lumpia"] += qty;
-                        else if (name.includes("Pork Lumpia")) itemCountsOnline["Pork Lumpia"] += qty;
-                        if (name.includes("with Rice") || name.includes("Extra Rice")) itemCountsOnline["Rice"] += qty;
-                    }
-                }
-            });
-        }
-    });
-
-    const breakdownOn = document.getElementById("onlineItemBreakdown");
-    if(breakdownOn) {
-        const displayOrder = ["Fried Chicken", "Pork Steak", "Pork Chop", "Vegetable Lumpia", "Pork Lumpia", "Rice"];
-        breakdownOn.innerHTML = displayOrder.map(name => `
-            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding: 5px 0;">
-              <span style="font-size: 11px; color: #ddd; white-space: nowrap;"><span style="color: #ff6b00; font-weight: bold; font-size: 14px; margin-right: 5px;">${itemCountsOnline[name]}</span> ${name.toUpperCase()}</span>
-            </div>
-          `).join('');
-    }
-
-    let instoreCounts = {};
-    menuInstore.forEach(m => instoreCounts[m.menu] = 0);
-    inHistoryBox.querySelectorAll("tr").forEach(row => {
-        const rawItems = row.cells[15].innerText;
-        if (rawItems) {
-            rawItems.split(', ').forEach(itemStr => {
-                const parts = itemStr.split('x ');
-                if(parts.length > 1) {
-                    const qty = parseInt(parts[0]) || 0;
-                    const menuItem = menuInstore.find(m => m.code === parts[1]);
-                    if(menuItem) instoreCounts[menuItem.menu] += qty;
-                }
-            });
-        }
-    });
-
-    const breakdownIn = document.getElementById("instoreItemBreakdown");
-    if(breakdownIn) {
-        breakdownIn.innerHTML = Object.keys(instoreCounts).sort().map(n => `
-            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding: 5px 0;">
-              <span style="font-size: 11px; color: #ddd; white-space: nowrap;"><span style="color: #ff6b00; font-weight: bold; font-size: 14px; margin-right: 5px;">${instoreCounts[n]}</span> ${n.toUpperCase()}</span>
-            </div>
-        `).join('');
-    }
-
-    const updateSide = (box, prefix, isInstore) => {
-        let sales = 0; let counts = {};
-        box.querySelectorAll("tr").forEach(row => {
-            const priceIdx = isInstore ? 2 : 3;
-            const itemsIdx = isInstore ? 15 : 14;
-            sales += parseFloat(row.cells[priceIdx].innerText.replace(/,/g, '')) || 0;
-            const itemsText = row.cells[itemsIdx].innerText;
-            itemsText.split(', ').forEach(str => {
-                const p = str.split('x ');
-                if(p.length > 1) {
-                    const m = (isInstore ? menuInstore : menuOnline).find(x => x.code === p[1]);
-                    if(m) counts[m.menu] = (counts[m.menu] || 0) + parseInt(p[0]);
-                }
+    const process = (boxId, prefix, menu) => {
+        const box = document.getElementById(boxId);
+        let sales = 0, counts = {};
+        box.querySelectorAll("tr").forEach(r => {
+            const priceCell = prefix === 'on_' ? 2 : 2;
+            const itemsCell = prefix === 'on_' ? 13 : 13;
+            sales += parseFloat(r.cells[priceCell].innerText.replace(/,/g, '')) || 0;
+            r.cells[itemsCell].innerText.split(', ').forEach(s => {
+                const p = s.split('x ');
+                if(p.length > 1) { const m = menu.find(x => x.code === p[1]); if(m) counts[m.menu] = (counts[m.menu] || 0) + parseInt(p[0]); }
             });
         });
         document.getElementById(prefix + "totalOrders").textContent = box.querySelectorAll("tr").length;
         document.getElementById(prefix + "totalSales").textContent = formatPHP(sales);
-        let best = "None"; let max = 0;
-        for(let n in counts) { if(counts[n] > max) { max = counts[n]; best = n; } }
+        let best = "None", max = 0; for(let n in counts) { if(counts[n] > max) { max = counts[n]; best = n; } }
         document.getElementById(prefix + "bestSeller").textContent = best;
+
+        const breakdown = document.getElementById(prefix === 'on_' ? "onlineItemBreakdown" : "instoreItemBreakdown");
+        const items = prefix === 'on_' ? ["Fried Chicken", "Pork Steak", "Pork Chop", "Vegetable Lumpia", "Pork Lumpia", "Rice"] : Object.keys(counts);
+        breakdown.innerHTML = items.map(n => `<div style="display:flex; justify-content:space-between; border-bottom:1px solid #333; padding:5px 0;"><span style="font-size:11px; color:#ddd;"><span style="color:#ff6b00; font-weight:bold; font-size:14px; margin-right:5px;">${counts[n] || 0}</span> ${n.toUpperCase()}</span></div>`).join('');
     };
-
-    updateSide(historyBox, "on_", false);
-    updateSide(inHistoryBox, "in_", true);
+    process("historyBox", "on_", menuOnline);
+    process("instoreHistoryBox", "in_", menuInstore);
 }
 
-function addOrderRow(c = "", q = 1) {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-        <td><select onchange="updateTable();"><option value="">Select</option>${menuOnline.map(m=>`<option value="${m.code}" ${m.code===c?'selected':''}>${m.menu}</option>`).join('')}</select></td>
-        <td><input type="number" value="${q}" min="1" oninput="updateTable();"></td>
-        <td class="row-total">0.00</td>
-    `;
-    orderBody.appendChild(tr);
+function submitSalesLog(type) {
+    let t = "";
+    if(type === 'online') {
+        document.getElementById("historyBox").querySelectorAll("tr").forEach(r => {
+            const rowData = [r.cells[9].innerText, r.cells[11].innerText, r.cells[12].innerText, r.cells[5].innerText, r.cells[6].innerText, r.cells[2].innerText, r.cells[3].querySelector('select').value, r.cells[4].querySelector('select').value, r.cells[13].innerText, r.cells[8].innerText, r.cells[14].innerText];
+            t += rowData.join("\t") + "\n";
+        });
+    } else {
+        document.getElementById("instoreHistoryBox").querySelectorAll("tr").forEach(r => {
+            const rowData = [r.cells[7].innerText, r.cells[11].innerText, r.cells[12].innerText, "In-Store", "Counter", r.cells[2].innerText, r.cells[14].innerText, r.cells[15].innerText, r.cells[13].innerText, r.cells[6].innerText, r.cells[1].innerText];
+            t += rowData.join("\t") + "\n";
+        });
+    }
+    navigator.clipboard.writeText(t);
+    window.location.href = "googlesheets://https://docs.google.com/spreadsheets/d/1Y0fxsaI3jva56h42jg9jRq1FS6vmbXmxl5X2e-cc69I/edit?gid=1589209915";
+    setTimeout(() => { if (document.hasFocus()) { window.open("https://docs.google.com/spreadsheets/d/1Y0fxsaI3jva56h42jg9jRq1FS6vmbXmxl5X2e-cc69I/edit?gid=1589209915", "_blank"); } }, 500);
 }
 
-function updateTable() {
-    let grand = 0;
-    const rows = orderBody.querySelectorAll("tr:not(#grandTotalRow)");
-    rows.forEach((r, i) => {
-        const code = r.querySelector("select").value;
-        const qty = parseInt(r.querySelector("input").value) || 0;
-        const item = menuOnline.find(m => m.code === code);
-        const price = item ? item.price * qty : 0;
-        r.querySelector(".row-total").textContent = formatPHP(price);
-        grand += price;
-        if (i === rows.length - 1 && code !== "") addOrderRow();
-    });
-    const old = document.getElementById("grandTotalRow"); if(old) old.remove();
-    const gt = document.createElement("tr"); gt.id = "grandTotalRow";
-    gt.innerHTML = `<td colspan="2" style="text-align:right; font-weight:bold;">Grand Total:</td><td style="color:red; font-weight:bold;">${formatPHP(grand)}</td>`;
-    orderBody.appendChild(gt);
-}
-
-document.getElementById("startNewOrderBtn").onclick = function() {
-    let valid = true;
-    if(!nameInp.value.trim()) { nameInp.classList.add("error-bump"); valid = false; }
-    if(commInp.value === "Home") { if(!addrInp.value.trim()) { addrInp.classList.add("error-bump"); valid = false; } }
-    else { if(!blkInp.value.trim()) { blkInp.classList.add("error-bump"); valid = false; } if(!lotInp.value.trim()) { lotInp.classList.add("error-bump"); valid = false; } }
-    
-    let codes = []; let pretty = []; let total = 0; let has = false;
-    orderBody.querySelectorAll("tr:not(#grandTotalRow)").forEach(r => {
-        const c = r.querySelector("select").value;
-        const q = r.querySelector("input").value;
-        const m = menuOnline.find(x => x.code === c);
-        if(m) { codes.push(`${q}x ${m.code}`); pretty.push(`${q}x ${m.menu}`); total += m.price * q; has = true; }
-    });
-
-    if(!valid || !has) { document.getElementById("validationError").style.display = "block"; return; }
-    document.getElementById("validationError").style.display = "none";
-    
-    const now = new Date();
-    const dStr = `${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getDate().toString().padStart(2,'0')}/${now.getFullYear()}`;
-    let h = now.getHours(); const ampm = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12;
-    const tStr = `${h.toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')} ${ampm}`;
-    const ref = dStr.replace(/\//g,'') + "-" + tStr.replace(/[: ]/g,'');
-    const fullAddr = (commInp.value === "Home") ? addrInp.value : `${commInp.value} - Blk ${blkInp.value}, Lot ${lotInp.value}`;
-
-    const hRow = document.createElement("tr");
-    hRow.innerHTML = `
-        <td><button class="action-btn" style="width:auto; padding:5px 10px; margin:0; font-size:11px;" onclick="copyOrderSummary(this, false)">Copy</button></td>
-        <td><button class="action-btn" style="width:auto; padding:5px 10px; margin:0; font-size:11px; background-color:#007bff;" onclick="copyReceipt(this, false)">Receipt</button></td>
-        <td>${currentCrew}</td>
-        <td style="font-weight:bold;">${formatPHP(total)}</td>
-        <td><select class="history-select" data-val="Unpaid" onchange="saveHistory()"><option>Unpaid</option><option>Paid</option></select></td>
-        <td><select class="history-select" data-val="GCash" onchange="saveHistory()"><option>GCash</option><option>Cash</option></select></td>
-        <td>${nameInp.value}</td><td>${fullAddr}</td><td>${pretty.join("<br>")}</td><td>${notesInp.value || '-'}</td><td style="font-weight:bold; color:#ff6b00;">${ref}</td>
-        <td><div style="display:flex;"><button class="edit-btn" onclick="editOrder(this, false)">✏️</button><button class="del-btn" onclick="deleteRow(this)">🗑️</button></div></td>
-        <th style="display:none">${dStr}</th><th style="display:none">${tStr}</th><th style="display:none">${codes.join(", ")}</th>
-    `;
-    historyBox.appendChild(hRow);
-    saveHistory();
-    copyOrderSummary(hRow.querySelector('button'), false);
-    this.textContent = "✅ Logged!";
-    setTimeout(() => { 
-        this.textContent = "Log Order & Clear";
-        nameInp.value = ""; addrInp.value = ""; notesInp.value = ""; blkInp.value = ""; lotInp.value = ""; commInp.value = "Home"; toggleAddressFields();
-        orderBody.innerHTML = ""; addOrderRow(); updateTable();
-    }, 1000);
-};
-
-function copyOrderSummary(btn, isInstore) {
+function copySummary(btn, isIn) {
     const r = btn.closest("tr");
-    const m = isInstore ? menuInstore : menuOnline;
-    const itemsIdx = isInstore ? 15 : 14;
-    const items = r.cells[itemsIdx].innerText.split(", ").map(s => {
-        const p = s.split("x ");
-        const item = m.find(x => x.code === p[1]);
-        return `${p[0]}x ${item ? item.menu : p[1]}`;
-    }).join("\n");
-    const text = isInstore ? `In-Store Receipt\nCrew: ${r.cells[1].innerText}\nTotal: ₱${r.cells[2].innerText}\nItems:\n${items}` : `${r.cells[10].innerText}\n${r.cells[12].innerText} ${r.cells[13].innerText}\nCrew: ${r.cells[2].innerText}\nName: ${r.cells[6].innerText}\nAddr: ${r.cells[7].innerText}\nTotal: ₱${r.cells[3].innerText}\nOrders:\n${items}\nNotes: ${r.cells[9].innerText}`;
+    const items = r.cells[isIn ? 13 : 13].innerText.split(', ').map(s => { const p = s.split('x '); const m = (isIn ? menuInstore : menuOnline).find(x => x.code === p[1]); return `${p[0]}x ${m ? m.menu : p[1]}`; }).join('\n');
+    const text = isIn ? `In-Store Receipt\nCrew: ${r.cells[1].innerText}\nTotal: ₱${r.cells[2].innerText}\nItems:\n${items}` : `${r.cells[9].innerText}\n${r.cells[11].innerText} ${r.cells[12].innerText}\nCrew: ${r.cells[14].innerText}\nName: ${r.cells[5].innerText}\nAddr: ${r.cells[6].innerText}\nTotal: ₱${r.cells[2].innerText}\nOrders:\n${items}\nNotes: ${r.cells[8].innerText}`;
     navigator.clipboard.writeText(text);
     btn.innerText = "✅"; setTimeout(() => btn.innerText = "Copy", 1000);
+    if(!isIn) {
+        window.location.href = "fb-messenger://user-thread/1629578618166443";
+        setTimeout(() => { if (document.hasFocus()) { window.open("https://www.messenger.com/t/1629578618166443", "_blank"); } }, 500);
+    }
 }
 
-function copyReceipt(btn, isInstore) {
+function copyReceipt(btn, isIn) {
     const r = btn.closest("tr");
-    const m = isInstore ? menuInstore : menuOnline;
-    const itemsIdx = isInstore ? 15 : 14;
-    const priceIdx = isInstore ? 2 : 3;
-    const items = r.cells[itemsIdx].innerText.split(", ").map(s => {
-        const p = s.split("x ");
-        const item = m.find(x => x.code === p[1]);
-        return `${p[0]}x ${item ? item.menu : p[1]}`;
-    }).join("\n");
-    navigator.clipboard.writeText(`${items}\nTotal: ₱${r.cells[priceIdx].innerText}`);
+    const items = r.cells[isIn ? 13 : 13].innerText.split(', ').map(s => { const p = s.split('x '); const m = (isIn ? menuInstore : menuOnline).find(x => x.code === p[1]); return `${p[0]}x ${m ? m.menu : p[1]}`; }).join('\n');
+    navigator.clipboard.writeText(`${items}\nTotal: ₱${r.cells[2].innerText}`);
     btn.innerText = "✅"; setTimeout(() => btn.innerText = "Receipt", 1000);
 }
 
-function editOrder(btn, isInstore) {
-    if(!confirm("Edit? This will delete current log.")) return;
-    const r = btn.closest("tr");
-    const codesIdx = isInstore ? 15 : 14;
-    const codes = r.cells[codesIdx].innerText.split(", ");
-    if(isInstore) {
-        switchTab('instore'); instoreCart = [];
-        codes.forEach(s => { const p = s.split("x "); instoreCart.push({code: p[1], qty: parseInt(p[0])}); });
-        document.getElementById("instoreNotes").value = r.cells[8].innerText === '-' ? "" : r.cells[8].innerText;
-        renderInstoreTable();
-    } else {
-        switchTab('online'); nameInp.value = r.cells[6].innerText; notesInp.value = r.cells[9].innerText === '-' ? "" : r.cells[9].innerText;
-        orderBody.innerHTML = ""; codes.forEach(s => { const p = s.split("x "); addOrderRow(p[1], p[0]); });
-        updateTable();
-    }
+function editOrder(btn, isIn) {
+    if(!confirm("Edit? This deletes entry.")) return;
+    const r = btn.closest("tr"); const codes = r.cells[isIn ? 13 : 13].innerText.split(", ");
+    if(isIn) { instoreCart = []; codes.forEach(s => { const p = s.split("x "); instoreCart.push({code: p[1], qty: parseInt(p[0])}); }); renderCart('instore'); document.getElementById("instoreNotes").value = r.cells[6].innerText; }
+    else { onlineCart = []; codes.forEach(s => { const p = s.split("x "); onlineCart.push({code: p[1], qty: parseInt(p[0])}); }); renderCart('online'); document.getElementById("customerName").value = r.cells[5].innerText; document.getElementById("specialInstructions").value = r.cells[8].innerText; }
     r.remove(); saveHistory();
 }
 
 function deleteRow(btn) { if(confirm("Delete?")) { btn.closest("tr").remove(); saveHistory(); } }
 function startNewDay() { if(confirm("Reset?")) { localStorage.clear(); location.reload(); } }
-function toggleAddressFields() {
-  const s = document.getElementById("subdivisionGroup"); const h = document.getElementById("homeAddressGroup");
-  if(commInp.value === "Home") { s.classList.add("hidden-field"); h.classList.remove("hidden-field"); }
-  else { s.classList.remove("hidden-field"); h.classList.add("hidden-field"); }
-}
+function toggleAddressFields() { const s = document.getElementById("subdivisionGroup"), h = document.getElementById("homeAddressGroup"), v = document.getElementById("communitySelect").value; if(v === "Home") { s.classList.add("hidden-field"); h.classList.remove("hidden-field"); } else { s.classList.remove("hidden-field"); h.classList.add("hidden-field"); } }
+function restoreSelects(id) { document.getElementById(id).querySelectorAll('select').forEach(s => { s.value = s.getAttribute('data-val'); s.onchange = saveHistory; }); }
 function formatPHP(n) { return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
-function updateClock() {
-  const n = new Date(); const t = document.getElementById('timePHT'); const d = document.getElementById('datePHT');
-  let h = n.getHours(); const a = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12;
-  t.textContent = `${h.toString().padStart(2,'0')}:${n.getMinutes().toString().padStart(2,'0')}:${n.getSeconds().toString().padStart(2,'0')} ${a}`;
-  d.textContent = n.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'2-digit', year:'numeric'});
-}
+function updateClock() { const n = new Date(); let h = n.getHours(); const a = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12; document.getElementById('timePHT').textContent = `${h.toString().padStart(2,'0')}:${n.getMinutes().toString().padStart(2,'0')}:${n.getSeconds().toString().padStart(2,'0')} ${a}`; document.getElementById('datePHT').textContent = n.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'2-digit', year:'numeric'}); }
 setInterval(updateClock, 1000);
-
-document.getElementById("copyTableBtn").onclick = function() {
-    let t = "Online History\nDate\tTime\tEmployee Name\tCrew\tTotal\tStatus\tMode\tName\tAddress\tOrders\tNotes\tRef\n";
-    historyBox.querySelectorAll("tr").forEach(r => {
-        t += [r.cells[12].innerText, r.cells[13].innerText, r.cells[2].innerText, r.cells[2].innerText, r.cells[3].innerText, r.cells[4].querySelector('select').value, r.cells[5].querySelector('select').value, r.cells[6].innerText, r.cells[7].innerText, r.cells[14].innerText, r.cells[9].innerText, r.cells[10].innerText].join("\t") + "\n";
-    });
-    t += "\nIn-Store History\nDate\tTime\tEmployee Name\tCrew\tTotal\tReceived\tChange\tStatus\tMode\tOrders\tNotes\tRef\n";
-    inHistoryBox.querySelectorAll("tr").forEach(r => {
-        t += [r.cells[13].innerText, r.cells[14].innerText, r.cells[1].innerText, r.cells[1].innerText, r.cells[2].innerText, r.cells[3].innerText, r.cells[4].innerText, r.cells[5].querySelector('select').value, r.cells[6].querySelector('select').value, r.cells[15].innerText, r.cells[8].innerText, r.cells[9].innerText].join("\t") + "\n";
-    });
-    navigator.clipboard.writeText(t);
-    window.location.href = "googlesheets://https://docs.google.com/spreadsheets/d/1Y0fxsaI3jva56h42jg9jRq1FS6vmbXmxl5X2e-cc69I/edit?gid=1589209915";
-};
+window.onload = init;
 </script>
 </body>
 </html>
