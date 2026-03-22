@@ -542,7 +542,7 @@ function submitSalesLog(type) {
         });
     } else {
         document.getElementById("instoreHistoryBox").querySelectorAll("tr").forEach(r => {
-            const rowData = [r.cells[8].innerText, new Date(r.cells[12].innerText).toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'}), r.cells[13].innerText, "In-Store", "Counter", r.cells[2].innerText, r.cells[15].innerText, r.cells[16].innerText, r.cells[5].innerText, r.cells[7].innerText, r.cells[1].innerText];
+            const rowData = [r.cells[7].innerText, new Date(r.cells[11].innerText).toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'}), r.cells[12].innerText, "In-Store", "Counter", r.cells[2].innerText, r.cells[14].innerText, r.cells[15].innerText, r.cells[13].innerText, r.cells[6].innerText, r.cells[1].innerText];
             t += rowData.join("\t") + "\n";
         });
     }
