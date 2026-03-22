@@ -31,7 +31,7 @@ td { color: black; border-bottom: 1px solid #eee; }
 .input-row { display: flex; flex-direction: column; margin-bottom: 12px; max-width: 850px; margin: 0 auto 12px auto; }
 .input-row label { font-weight: bold; color: black; margin-bottom: 5px; font-size: 14px;}
 .input-row input, .input-row select { padding: 8px; font-size: 16px; border: 2px solid #ccc; border-radius: 8px; transition: all 0.3s; width: 100%; box-sizing: border-box; }
-.side-by-side { display: flex; gap: 10px; justify-content: center; max-width: 850px; margin: 0 auto 12px auto; align-items: flex-start; }
+.side-by-side { display: flex; gap: 10px; justify-content: flex-start; max-width: 850px; margin: 0 auto 12px auto; align-items: flex-start; }
 .side-by-side .input-row { flex: 0 0 auto; margin: 0; }
 .small-input { width: 80px !important; }
 .hidden-field { display: none; }
@@ -47,7 +47,6 @@ td { color: black; border-bottom: 1px solid #eee; }
 .del-btn { background: none; border: none; cursor: pointer; font-size: 20px; font-weight: bold; display: flex; align-items: center; justify-content: center; }
 .edit-btn { background: none; border: none; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; margin-right: 5px; }
 .history-select { padding: 4px; border-radius: 4px; border: 1px solid #ccc; font-size: 12px; }
-.success-state { background-color: #4cd964 !important; box-shadow: 0 6px #38a84d !important; }
 .error-msg { color: #ff3b30; font-size: 14px; text-align: center; font-weight: bold; margin-bottom: 15px; display: none; }
 .history-panel { background-color: white; border-radius: 10px; padding: 15px; margin-top: 20px;}
 .history-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
@@ -59,8 +58,8 @@ td { color: black; border-bottom: 1px solid #eee; }
 .required-star { color: #ff3b30; font-size: 12px; margin-left: 4px; }
 .error-bump { border: 2px solid #ff3b30 !important; animation: shake 0.4s ease-in-out; }
 @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-5px); } }
-.product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px; justify-items: center; justify-content: center; }
-.category-title { grid-column: 1 / -1; background: #000; color: #ff6b00; padding: 5px 15px; border-radius: 8px; font-size: 14px; font-weight: bold; margin-top: 10px; text-align: center; width: 100%; box-sizing: border-box; }
+.product-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; justify-content: center; }
+.category-title { flex: 0 0 100%; background: #000; color: #ff6b00; padding: 5px 15px; border-radius: 8px; font-size: 14px; font-weight: bold; margin-top: 10px; text-align: center; width: 100%; box-sizing: border-box; }
 .prod-btn { width: 140px; background: #ff6b00; border: none; color: white; padding: 15px 10px; border-radius: 12px; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; box-shadow: 0 5px #b34a00; transition: all 0.1s; position: relative; top: 0; }
 .prod-btn:active { top: 3px; box-shadow: 0 2px #b34a00; }
 .prod-btn.clicked { background: #4cd964 !important; box-shadow: 0 5px #38a84d !important; }
@@ -127,13 +126,13 @@ td { color: black; border-bottom: 1px solid #eee; }
           </select>
         </div>
         <div id="subdivisionGroup" class="hidden-field side-by-side">
-          <div>
+          <div style="display:flex; flex-direction:column; gap:10px;">
             <div class="input-row"><label>BLK/Floor <span class="required-star">*</span></label><input type="text" id="blockFloor" class="small-input" placeholder="000" oninput="limitDigits(this, 4); autoSwitchOnlineTarget(); saveCurrentDraft();" onfocus="setCurrentNumpadTarget('blockFloor')"></div>
             <div class="input-row"><label>Lot/Room <span class="required-star">*</span></label><input type="text" id="lotRoom" class="small-input" placeholder="000" oninput="limitDigits(this, 4); saveCurrentDraft();" onfocus="setCurrentNumpadTarget('lotRoom')"></div>
           </div>
           <div class="numpad" style="max-width:180px;">
             <button class="special" onclick="numpadInput('X')">X</button>
-            <button class="special" onclick="numpadInput('C')">Clear</button>
+            <button class="special" onclick="numpadInput('NEXT')">Next</button>
             <button onclick="numpadInput('0')">0</button>
             <button onclick="numpadInput('1')">1</button><button onclick="numpadInput('2')">2</button><button onclick="numpadInput('3')">3</button>
             <button onclick="numpadInput('4')">4</button><button onclick="numpadInput('5')">5</button><button onclick="numpadInput('6')">6</button>
@@ -193,7 +192,7 @@ td { color: black; border-bottom: 1px solid #eee; }
                     <button onclick="numpadInput('1')">1</button><button onclick="numpadInput('2')">2</button><button onclick="numpadInput('3')">3</button>
                     <button onclick="numpadInput('4')">4</button><button onclick="numpadInput('5')">5</button><button onclick="numpadInput('6')">6</button>
                     <button onclick="numpadInput('7')">7</button><button onclick="numpadInput('8')">8</button><button onclick="numpadInput('9')">9</button>
-                    <button onclick="numpadInput('0')">0</button><button onclick="numpadInput('000')">000</button><button onclick="numpadInput('.')">.</button>
+                    <button onclick="numpadInput('0')">0</button><button onclick="numpadInput('00')">00</button><button onclick="numpadInput('000')">000</button>
                   </div>
                 </div>
             </div>
@@ -431,8 +430,8 @@ function logOnlineOrder() {
         <td><button class="action-btn" style="width:auto; padding:5px 10px; margin:0; font-size:11px; background-color:#007bff;" onclick="copyReceipt(this, false)">Receipt</button></td>
         <td style="font-weight:bold;">${formatPHP(total)}</td>
         <td><select class="history-select" data-val="Unpaid" onchange="saveHistory()"><option>Unpaid</option><option>Paid</option></select></td>
-        <td><select class="history-select" data-val="GCash" onchange="saveHistory()"><option>GCash</option><option>Cash</option></select></td>
-        <td>${name.value}</td><td>${fullAddr}</td><td>${pretty.join("<br>")}</td><td>${document.getElementById("specialInstructions").value || '-'}</td><td style="font-weight:bold; color:#ff6b00;">${ref}</td>
+        <td><select class="history-select" data-val="GCash" onchange="saveHistory()"><option>GCash</option><option>Cash</option><option>Bank Transfer</option><option>Credit Card</option></select></td>
+        <td>${name.value}</td><td>${fullAddr}</td><td>${pretty.join("<br>")}</td><td>${document.getElementById("specialInstructions").value || ''}</td><td style="font-weight:bold; color:#ff6b00;">${ref}</td>
         <td><div style="display:flex;"><button class="edit-btn" onclick="editOrder(this, false)">✏️</button><button class="del-btn" onclick="deleteRow(this)">🗑️</button></div></td>
         <th style="display:none">${dStr}</th><th style="display:none">${tStr}</th><th style="display:none">${codes.join(", ")}</th><th style="display:none">${currentCrew}</th>`;
     document.getElementById("historyBox").prepend(tr);
@@ -467,7 +466,7 @@ function logInstoreOrder() {
     const tr = document.createElement("tr");
     tr.innerHTML = `<td><button class="action-btn" style="width:auto; padding:5px 10px; margin:0; font-size:11px; background-color:#007bff;" onclick="copyReceipt(this, true)">Receipt</button></td>
         <td>${currentCrew}</td><td style="font-weight:bold;">${formatPHP(total)}</td><td>${formatPHP(parseFloat(cash.value))}</td><td>${formatPHP(calculateChange())}</td>
-        <td>${pretty.join("<br>")}</td><td>${document.getElementById("instoreNotes").value || '-'}</td><td>${tStr}</td><td style="font-weight:bold; color:#ff6b00;">${ref}</td>
+        <td>${pretty.join("<br>")}</td><td>${document.getElementById("instoreNotes").value || ''}</td><td>${tStr}</td><td style="font-weight:bold; color:#ff6b00;">${ref}</td>
         <td><div style="display:flex;"><button class="edit-btn" onclick="editOrder(this, true)">✏️</button><button class="del-btn" onclick="deleteRow(this)">🗑️</button></div></td>
         <th style="display:none">In-store</th><th style="display:none">In-store</th><th style="display:none">${dStr}</th><th style="display:none">${tStr}</th><th style="display:none">${codes.join(", ")}</th><th style="display:none">Paid</th><th style="display:none">Cash</th>`;
     document.getElementById("instoreHistoryBox").prepend(tr);
@@ -679,6 +678,11 @@ function numpadInput(val) {
   else if(val === 'E') { 
     const gt = document.getElementById("instoreGrandTotal").textContent.replace(/,/g, '');
     target.value = gt;
+  }
+  else if(val === 'NEXT') {
+    currentNumpadTarget = "lotRoom";
+    document.getElementById("lotRoom").focus();
+    return;
   }
   else {
     if(currentNumpadTarget === 'cashReceived' && val === '.' && target.value.includes('.')) return;
