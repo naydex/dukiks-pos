@@ -68,8 +68,9 @@ td { color: black; border-bottom: 1px solid #eee; }
 .login-btn { background: #eee; padding: 20px; border-radius: 12px; text-align: center; cursor: pointer; font-weight: bold; border: 2px solid #ccc; }
 .login-btn:hover { background: #ddd; }
 .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px; }
-.prod-btn { background: #ff6b00; border: 2px solid #000; color: white; padding: 15px 10px; border-radius: 12px; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-.prod-btn:active { background: #000; color: #ff6b00; }
+.category-title { grid-column: 1 / -1; background: #000; color: #ff6b00; padding: 5px 15px; border-radius: 8px; font-size: 14px; font-weight: bold; margin-top: 10px; }
+.prod-btn { background: #ff6b00; border: none; color: white; padding: 15px 10px; border-radius: 12px; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; box-shadow: 0 5px #b34a00; transition: all 0.1s; position: relative; top: 0; }
+.prod-btn:active { top: 3px; box-shadow: 0 2px #b34a00; }
 .prod-btn span { font-size: 10px; color: #fff; margin-top: 5px; opacity: 0.8; }
 .calculator-box { background: #f0f0f0; padding: 15px; border-radius: 12px; margin-top: 20px; border: 1px solid #ccc; transition: background 0.3s; }
 .calc-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 18px; font-weight: bold; }
@@ -153,11 +154,15 @@ td { color: black; border-bottom: 1px solid #eee; }
       </div>
 
       <div class="panel history-panel">
-          <h3 style="text-align:center">Online Order History</h3>
+          <h3 style="text-align:center">Online Order History Dashboard</h3>
           <div class="summary-container">
-            <div class="summary-card"><div>Orders</div><span id="on_totalOrders">0</span></div>
-            <div class="summary-card"><div>Sales</div><span id="on_totalSales">0.00</span></div>
+            <div class="summary-card"><div>Total Orders</div><span id="on_totalOrders">0</span></div>
+            <div class="summary-card"><div>Total Sales</div><span id="on_totalSales">0.00</span></div>
             <div class="summary-card"><div>Best Seller</div><span id="on_bestSeller">None</span></div>
+          </div>
+          <div class="summary-card" style="text-align: left; padding: 20px; width: 100%; box-sizing: border-box; margin-bottom: 20px;">
+            <div style="text-align: center; margin-bottom: 15px; color: #ff6b00; font-size: 10px; text-transform: uppercase; font-weight: bold; letter-spacing: 1px;">Current Inventory / Item Breakdown</div>
+            <div id="onlineItemBreakdown" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;"></div>
           </div>
           <div style="overflow-x:auto;">
             <table class="history-table">
@@ -188,11 +193,15 @@ td { color: black; border-bottom: 1px solid #eee; }
         </div>
 
         <div class="panel history-panel">
-            <h3 style="text-align:center">In-Store Order History</h3>
+            <h3 style="text-align:center">In-Store Order History Dashboard</h3>
             <div class="summary-container">
-              <div class="summary-card"><div>Orders</div><span id="in_totalOrders">0</span></div>
-              <div class="summary-card"><div>Sales</div><span id="in_totalSales">0.00</span></div>
+              <div class="summary-card"><div>Total Orders</div><span id="in_totalOrders">0</span></div>
+              <div class="summary-card"><div>Total Sales</div><span id="in_totalSales">0.00</span></div>
               <div class="summary-card"><div>Best Seller</div><span id="in_bestSeller">None</span></div>
+            </div>
+            <div class="summary-card" style="text-align: left; padding: 20px; width: 100%; box-sizing: border-box; margin-bottom: 20px;">
+              <div style="text-align: center; margin-bottom: 15px; color: #ff6b00; font-size: 10px; text-transform: uppercase; font-weight: bold; letter-spacing: 1px;">Current Inventory / Item Breakdown</div>
+              <div id="instoreItemBreakdown" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;"></div>
             </div>
             <div style="overflow-x:auto;">
               <table class="history-table">
@@ -204,10 +213,6 @@ td { color: black; border-bottom: 1px solid #eee; }
     </div>
 
     <div class="panel history-panel">
-        <div class="summary-card" style="text-align: left; padding: 20px; width: 100%; box-sizing: border-box;">
-            <div style="text-align: center; margin-bottom: 15px; color: #ff6b00; font-size: 10px; text-transform: uppercase; font-weight: bold; letter-spacing: 1px;">Current Inventory / Item Breakdown</div>
-            <div id="itemBreakdown" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;"></div>
-        </div>
         <button class="action-btn" id="copyTableBtn" style="margin-top: 30px;">⧉ Submit Sales Log</button>
         <button class="action-btn" id="newDayBtn" onclick="startNewDay()">Start a New Day</button>
         <button class="action-btn" style="background:#444; box-shadow: 0 6px #222;" onclick="logoutGlobal()">Switch Crew / Logout</button>
@@ -258,10 +263,16 @@ async function fetchData() {
         menuInstore = mi.split('\n').slice(1).map(row => {
             const cols = row.split(',');
             if(cols.length < 4) return null;
-            const item = { type: cols[0].trim(), menu: cols[1].trim(), code: cols[2].trim(), price: parseFloat(cols[3]) };
-            inGrid.innerHTML += `<button class="prod-btn" onclick="addToInstoreCart('${item.code}')">${item.menu}<span>₱${item.price.toFixed(2)}</span></button>`;
-            return item;
+            return { type: cols[0].trim(), menu: cols[1].trim(), code: cols[2].trim(), price: parseFloat(cols[3]) };
         }).filter(x => x);
+
+        const categories = [...new Set(menuInstore.map(item => item.type))];
+        categories.forEach(cat => {
+            inGrid.innerHTML += `<div class="category-title">${cat.toUpperCase()}</div>`;
+            menuInstore.filter(i => i.type === cat).forEach(item => {
+                inGrid.innerHTML += `<button class="prod-btn" onclick="addToInstoreCart('${item.code}')">${item.menu}<span>₱${item.price.toFixed(2)}</span></button>`;
+            });
+        });
 
         const commSelect = document.getElementById("communitySelect");
         commSelect.innerHTML = '<option value="Home">Home Address (Not a Subdivision)</option>';
@@ -355,9 +366,11 @@ function calculateChange() {
     if (change < 0) {
         disp.classList.add("change-warning");
         box.classList.add("calc-error");
+        box.classList.add("error-bump");
     } else {
         disp.classList.remove("change-warning");
         box.classList.remove("calc-error");
+        box.classList.remove("error-bump");
     }
     return change;
 }
@@ -454,6 +467,64 @@ function saveHistory() {
 }
 
 function updateSummary() {
+    let itemCountsOnline = { "Fried Chicken": 0, "Pork Steak": 0, "Pork Chop": 0, "Vegetable Lumpia": 0, "Pork Lumpia": 0, "Rice": 0 };
+    historyBox.querySelectorAll("tr").forEach(row => {
+        const rawItems = row.cells[14].innerText;
+        if (rawItems) {
+            rawItems.split(', ').forEach(itemStr => {
+                const parts = itemStr.split('x ');
+                if(parts.length > 1) {
+                    const qty = parseInt(parts[0]) || 0;
+                    const menuItem = menuOnline.find(m => m.code === parts[1]);
+                    if(menuItem) {
+                        const name = menuItem.menu;
+                        if (name.includes("Fried Chicken")) itemCountsOnline["Fried Chicken"] += qty;
+                        else if (name.includes("Pork Steak")) itemCountsOnline["Pork Steak"] += qty;
+                        else if (name.includes("Pork Chop")) itemCountsOnline["Pork Chop"] += qty;
+                        else if (name.includes("Vegetable Lumpia")) itemCountsOnline["Vegetable Lumpia"] += qty;
+                        else if (name.includes("Pork Lumpia")) itemCountsOnline["Pork Lumpia"] += qty;
+                        if (name.includes("with Rice") || name.includes("Extra Rice")) itemCountsOnline["Rice"] += qty;
+                    }
+                }
+            });
+        }
+    });
+
+    const breakdownOn = document.getElementById("onlineItemBreakdown");
+    if(breakdownOn) {
+        const displayOrder = ["Fried Chicken", "Pork Steak", "Pork Chop", "Vegetable Lumpia", "Pork Lumpia", "Rice"];
+        breakdownOn.innerHTML = displayOrder.map(name => `
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding: 5px 0;">
+              <span style="font-size: 11px; color: #ddd; white-space: nowrap;"><span style="color: #ff6b00; font-weight: bold; font-size: 14px; margin-right: 5px;">${itemCountsOnline[name]}</span> ${name.toUpperCase()}</span>
+            </div>
+          `).join('');
+    }
+
+    let instoreCounts = {};
+    menuInstore.forEach(m => instoreCounts[m.menu] = 0);
+    inHistoryBox.querySelectorAll("tr").forEach(row => {
+        const rawItems = row.cells[15].innerText;
+        if (rawItems) {
+            rawItems.split(', ').forEach(itemStr => {
+                const parts = itemStr.split('x ');
+                if(parts.length > 1) {
+                    const qty = parseInt(parts[0]) || 0;
+                    const menuItem = menuInstore.find(m => m.code === parts[1]);
+                    if(menuItem) instoreCounts[menuItem.menu] += qty;
+                }
+            });
+        }
+    });
+
+    const breakdownIn = document.getElementById("instoreItemBreakdown");
+    if(breakdownIn) {
+        breakdownIn.innerHTML = Object.keys(instoreCounts).sort().map(n => `
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding: 5px 0;">
+              <span style="font-size: 11px; color: #ddd; white-space: nowrap;"><span style="color: #ff6b00; font-weight: bold; font-size: 14px; margin-right: 5px;">${instoreCounts[n]}</span> ${n.toUpperCase()}</span>
+            </div>
+        `).join('');
+    }
+
     const updateSide = (box, prefix, isInstore) => {
         let sales = 0; let counts = {};
         box.querySelectorAll("tr").forEach(row => {
@@ -461,8 +532,7 @@ function updateSummary() {
             const itemsIdx = isInstore ? 15 : 14;
             sales += parseFloat(row.cells[priceIdx].innerText.replace(/,/g, '')) || 0;
             const itemsText = row.cells[itemsIdx].innerText;
-            const itemsArr = itemsText.split(', ');
-            itemsArr.forEach(str => {
+            itemsText.split(', ').forEach(str => {
                 const p = str.split('x ');
                 if(p.length > 1) {
                     const m = (isInstore ? menuInstore : menuOnline).find(x => x.code === p[1]);
@@ -475,23 +545,10 @@ function updateSummary() {
         let best = "None"; let max = 0;
         for(let n in counts) { if(counts[n] > max) { max = counts[n]; best = n; } }
         document.getElementById(prefix + "bestSeller").textContent = best;
-        return counts;
     };
 
-    const c1 = updateSide(historyBox, "on_", false);
-    const c2 = updateSide(inHistoryBox, "in_", true);
-    
-    const combined = {};
-    [...menuOnline, ...menuInstore].forEach(m => combined[m.menu] = 0);
-    for(let n in c1) combined[n] = (combined[n] || 0) + c1[n];
-    for(let n in c2) combined[n] = (combined[n] || 0) + c2[n];
-
-    const b = document.getElementById("itemBreakdown");
-    b.innerHTML = Object.keys(combined).sort().map(n => `
-        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding: 5px 0;">
-          <span style="font-size: 11px; color: #ddd; white-space: nowrap;"><span style="color: #ff6b00; font-weight: bold; font-size: 14px; margin-right: 5px;">${combined[n]}</span> ${n.toUpperCase()}</span>
-        </div>
-    `).join('');
+    updateSide(historyBox, "on_", false);
+    updateSide(inHistoryBox, "in_", true);
 }
 
 function addOrderRow(c = "", q = 1) {
@@ -632,13 +689,13 @@ function updateClock() {
 setInterval(updateClock, 1000);
 
 document.getElementById("copyTableBtn").onclick = function() {
-    let t = "Online History\nDate\tTime\tCrew\tTotal\tStatus\tMode\tName\tAddress\tOrders\tNotes\tRef\n";
+    let t = "Online History\nDate\tTime\tEmployee Name\tCrew\tTotal\tStatus\tMode\tName\tAddress\tOrders\tNotes\tRef\n";
     historyBox.querySelectorAll("tr").forEach(r => {
-        t += [r.cells[12].innerText, r.cells[13].innerText, r.cells[2].innerText, r.cells[3].innerText, r.cells[4].querySelector('select').value, r.cells[5].querySelector('select').value, r.cells[6].innerText, r.cells[7].innerText, r.cells[14].innerText, r.cells[9].innerText, r.cells[10].innerText].join("\t") + "\n";
+        t += [r.cells[12].innerText, r.cells[13].innerText, r.cells[2].innerText, r.cells[2].innerText, r.cells[3].innerText, r.cells[4].querySelector('select').value, r.cells[5].querySelector('select').value, r.cells[6].innerText, r.cells[7].innerText, r.cells[14].innerText, r.cells[9].innerText, r.cells[10].innerText].join("\t") + "\n";
     });
-    t += "\nIn-Store History\nDate\tTime\tCrew\tTotal\tReceived\tChange\tStatus\tMode\tOrders\tNotes\tRef\n";
+    t += "\nIn-Store History\nDate\tTime\tEmployee Name\tCrew\tTotal\tReceived\tChange\tStatus\tMode\tOrders\tNotes\tRef\n";
     inHistoryBox.querySelectorAll("tr").forEach(r => {
-        t += [r.cells[13].innerText, r.cells[14].innerText, r.cells[1].innerText, r.cells[2].innerText, r.cells[3].innerText, r.cells[4].innerText, r.cells[5].querySelector('select').value, r.cells[6].querySelector('select').value, r.cells[15].innerText, r.cells[8].innerText, r.cells[9].innerText].join("\t") + "\n";
+        t += [r.cells[13].innerText, r.cells[14].innerText, r.cells[1].innerText, r.cells[1].innerText, r.cells[2].innerText, r.cells[3].innerText, r.cells[4].innerText, r.cells[5].querySelector('select').value, r.cells[6].querySelector('select').value, r.cells[15].innerText, r.cells[8].innerText, r.cells[9].innerText].join("\t") + "\n";
     });
     navigator.clipboard.writeText(t);
     window.location.href = "googlesheets://https://docs.google.com/spreadsheets/d/1Y0fxsaI3jva56h42jg9jRq1FS6vmbXmxl5X2e-cc69I/edit?gid=1589209915";
