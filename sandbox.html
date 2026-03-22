@@ -410,7 +410,7 @@ function logOnlineOrder() {
         <td>${name.value}</td><td>${fullAddr}</td><td>${pretty.join("<br>")}</td><td>${document.getElementById("specialInstructions").value || '-'}</td><td style="font-weight:bold; color:#ff6b00;">${ref}</td>
         <td><div style="display:flex;"><button class="edit-btn" onclick="editOrder(this, false)">✏️</button><button class="del-btn" onclick="deleteRow(this)">🗑️</button></div></td>
         <th style="display:none">${dStr}</th><th style="display:none">${tStr}</th><th style="display:none">${codes.join(", ")}</th><th style="display:none">${currentCrew}</th>`;
-    document.getElementById("historyBox").appendChild(tr);
+    document.getElementById("historyBox").prepend(tr);
     saveHistory();
     copySummary(tr.querySelector('button'), false);
     onlineCart = []; renderCart('online');
@@ -449,7 +449,7 @@ function logInstoreOrder() {
         <td>${pretty.join("<br>")}</td><td>${document.getElementById("instoreNotes").value || '-'}</td><td style="font-weight:bold; color:#ff6b00;">${ref}</td>
         <td><div style="display:flex;"><button class="edit-btn" onclick="editOrder(this, true)">✏️</button><button class="del-btn" onclick="deleteRow(this)">🗑️</button></div></td>
         <th style="display:none">In-store</th><th style="display:none">In-store</th><th style="display:none">${dStr}</th><th style="display:none">${tStr}</th><th style="display:none">${codes.join(", ")}</th><th style="display:none">Paid</th><th style="display:none">Cash</th>`;
-    document.getElementById("instoreHistoryBox").appendChild(tr);
+    document.getElementById("instoreHistoryBox").prepend(tr);
     saveHistory();
     instoreCart = []; renderCart('instore');
     cash.value = ""; document.getElementById("instoreNotes").value = "";
