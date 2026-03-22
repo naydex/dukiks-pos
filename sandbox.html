@@ -8,14 +8,14 @@
 body {
   font-family: Arial, sans-serif;
   margin: 0;
-  padding: 80px 10px 40px 10px;
+  padding: 120px 10px 40px 10px;
   background-color: #ff6b00;
   font-size: 16px;
 }
 .logo-container { text-align: center; margin-top: 10px; }
 .logo-container img { max-height: 80px; width: auto; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3)); }
 h1 { text-align: center; font-weight: bold; font-size: 28px; color: white; margin-top: 5px; }
-.subtitle { text-align: center; font-size: 11px; color: white; margin-bottom: 30px; }
+.subtitle { text-align: center; font-size: 11px; color: white; margin-bottom: 20px; }
 .panel { max-width: 1000px; width: 100%; margin: 0 auto 40px auto; box-sizing: border-box; }
 #orderTable th { color: white !important; background-color: black; }
 table { border-collapse: collapse; border-radius: 10px; overflow: hidden; background: white; width: 100%; font-size: 14px; }
@@ -59,6 +59,25 @@ td { color: black; border-bottom: 1px solid #eee; }
 .required-star { color: #ff3b30; font-size: 12px; margin-left: 4px; }
 .error-bump { border: 2px solid #ff3b30 !important; animation: shake 0.4s ease-in-out; }
 @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-5px); } }
+
+.tab-container { position: fixed; top: 65px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; z-index: 9998; width: 90%; max-width: 500px; }
+.tab-btn { flex: 1; padding: 10px; border: none; background: #333; color: white; font-weight: bold; border-radius: 10px 10px 0 0; cursor: pointer; }
+.tab-btn.active { background: white; color: black; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+.login-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+.login-btn { background: #eee; padding: 20px; border-radius: 12px; text-align: center; cursor: pointer; font-weight: bold; border: 2px solid #ccc; }
+.login-btn:hover { background: #ddd; }
+
+.product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px; }
+.prod-btn { background: #f9f9f9; border: 2px solid #333; padding: 15px 10px; border-radius: 12px; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+.prod-btn:active { background: #ff6b00; color: white; }
+.prod-btn span { font-size: 10px; color: #666; margin-top: 5px; }
+
+.calculator-box { background: #f0f0f0; padding: 15px; border-radius: 12px; margin-top: 20px; border: 1px solid #ccc; }
+.calc-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 18px; font-weight: bold; }
+.change-amt { color: #28a745; font-size: 24px; }
 </style>
 </head>
 <body>
@@ -66,61 +85,96 @@ td { color: black; border-bottom: 1px solid #eee; }
   <div class="digital-time" id="timePHT"></div>
   <div class="date-display" id="datePHT"></div>
 </div>
+
+<div class="tab-container">
+  <button class="tab-btn active" onclick="switchTab('online')">Online POS</button>
+  <button class="tab-btn" onclick="switchTab('instore')">In-Store POS</button>
+</div>
+
 <div class="logo-container">
   <img src="dukiks-logo.png" alt="Dukiks Logo">
 </div>
 <h1>Dukik's Hungry Hub</h1>
-<div class="subtitle">Order Intake Form</div>
-<div class="panel">
-  <table id="menuReferenceTable">
-    <thead><tr><th>Type</th><th>Menu</th><th>Code</th><th>Price</th></tr></thead>
-    <tbody id="menuReferenceBody">
-        <tr><td colspan="4" style="text-align:center">Loading Menu Data...</td></tr>
-    </tbody>
-  </table>
+
+<div id="onlineTab" class="tab-content active">
+  <div class="subtitle">Order Intake Form</div>
+  <div class="panel">
+    <table id="menuReferenceTable">
+      <thead><tr><th>Type</th><th>Menu</th><th>Code</th><th>Price</th></tr></thead>
+      <tbody id="menuReferenceBody">
+          <tr><td colspan="4" style="text-align:center">Loading Menu Data...</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="panel white-panel" id="intakePanel">
+    <h2>Order Intake</h2>
+    <div id="validationError" class="error-msg">⚠️ Please check Name, Address, and Items!</div>
+    <div class="input-row">
+      <label>Name <span class="required-star">*</span></label>
+      <input type="text" id="customerName" placeholder="Customer Name" oninput="saveCurrentDraft()">
+    </div>
+    <div class="input-row">
+      <label>Community <span class="required-star">*</span></label>
+      <select id="communitySelect" onchange="toggleAddressFields(); saveCurrentDraft();">
+          <option value="Home">Home Address (Not a Subdivision)</option>
+      </select>
+    </div>
+    <div id="subdivisionGroup" class="hidden-field side-by-side">
+      <div class="input-row">
+        <label>BLK/Floor <span class="required-star">*</span></label>
+        <input type="text" id="blockFloor" class="small-input" placeholder="000" oninput="this.value = this.value.replace(/[^0-9]/g, '').substring(0,4); saveCurrentDraft();">
+      </div>
+      <div class="input-row">
+        <label>Lot/Room <span class="required-star">*</span></label>
+        <input type="text" id="lotRoom" class="small-input" placeholder="000" oninput="this.value = this.value.replace(/[^0-9]/g, '').substring(0,4); saveCurrentDraft();">
+      </div>
+    </div>
+    <div id="homeAddressGroup">
+      <div class="input-row">
+        <label>Home Address <span class="required-star">*</span></label>
+        <input type="text" id="customerAddress" placeholder="Street / Barangay / Landmark" oninput="saveCurrentDraft()">
+      </div>
+    </div>
+    <table class="order-table" id="orderTable">
+      <thead><tr><th>Order <span class="required-star">*</span></th><th>Qty</th><th>Price</th></tr></thead>
+      <tbody id="orderBody"></tbody>
+    </table>
+    <div class="input-row">
+      <label>Notes</label>
+      <input type="text" id="specialInstructions" placeholder="Special Instructions" oninput="saveCurrentDraft()">
+    </div>
+    <button class="action-btn" id="startNewOrderBtn">Log Order & Clear</button>
+  </div>
 </div>
-<div class="panel white-panel" id="intakePanel">
-  <h2>Order Intake</h2>
-  <div id="validationError" class="error-msg">⚠️ Please check Name, Address, and Items!</div>
-  <div class="input-row">
-    <label>Name <span class="required-star">*</span></label>
-    <input type="text" id="customerName" placeholder="Customer Name" oninput="saveCurrentDraft()">
-  </div>
-  <div class="input-row">
-    <label>Community <span class="required-star">*</span></label>
-    <select id="communitySelect" onchange="toggleAddressFields(); saveCurrentDraft();">
-        <option value="Home">Home Address (Not a Subdivision)</option>
-    </select>
-  </div>
-  <div id="subdivisionGroup" class="hidden-field side-by-side">
-    <div class="input-row">
-      <label>BLK/Floor <span class="required-star">*</span></label>
-      <input type="text" id="blockFloor" class="small-input" placeholder="000" oninput="this.value = this.value.replace(/[^0-9]/g, '').substring(0,4); saveCurrentDraft();">
+
+<div id="instoreTab" class="tab-content">
+    <div id="loginScreen" class="panel white-panel">
+        <h2>Crew Login</h2>
+        <div id="crewButtons" class="login-grid">Loading Crew...</div>
     </div>
-    <div class="input-row">
-      <label>Lot/Room <span class="required-star">*</span></label>
-      <input type="text" id="lotRoom" class="small-input" placeholder="000" oninput="this.value = this.value.replace(/[^0-9]/g, '').substring(0,4); saveCurrentDraft();">
+
+    <div id="registerScreen" class="panel white-panel" style="display:none;">
+        <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 15px;">
+            <span id="activeCrewDisplay" style="font-weight:bold;">Crew: -</span>
+            <button onclick="logoutCrew()" style="font-size:11px; padding:5px;">Logout</button>
+        </div>
+        <div id="instoreProductButtons" class="product-grid"></div>
+        
+        <table class="order-table">
+            <thead><tr><th>Item</th><th>Qty</th><th>Total</th></tr></thead>
+            <tbody id="instoreOrderBody"></tbody>
+        </table>
+
+        <div class="calculator-box">
+            <div class="calc-row"><span>Grand Total:</span><span id="instoreGrandTotal">0.00</span></div>
+            <div class="calc-row"><span>Cash Received:</span><input type="number" id="cashReceived" style="width:120px;" oninput="calculateChange()"></div>
+            <div class="calc-row" style="border-top: 1px solid #ccc; padding-top:10px;"><span>Change:</span><span id="changeDue" class="change-amt">0.00</span></div>
+        </div>
+
+        <button class="action-btn" id="logInstoreBtn" onclick="logInstoreOrder()">Log In-Store Sale</button>
     </div>
-  </div>
-  <div id="homeAddressGroup">
-    <div class="input-row">
-      <label>Home Address <span class="required-star">*</span></label>
-      <input type="text" id="customerAddress" placeholder="Street / Barangay / Landmark" oninput="saveCurrentDraft()">
-    </div>
-  </div>
-  <table class="order-table" id="orderTable">
-    <thead><tr><th>Order <span class="required-star">*</span></th><th>Qty</th><th>Price</th></tr></thead>
-    <tbody id="orderBody"></tbody>
-  </table>
-  <div class="input-row">
-    <label>Notes</label>
-    <input type="text" id="specialInstructions" placeholder="Special Instructions" oninput="saveCurrentDraft()">
-  </div>
-  <button class="action-btn" id="startNewOrderBtn">Log Order & Clear</button>
-  <small style="display:block; text-align:center; color:#FFFFFF; margin-top:-10px; margin-bottom:20px; font-size: 12px; font-weight: normal;">
-    This button saves the order to history, clears the form, and generates a unique Reference Number.
-  </small>
 </div>
+
 <div class="panel history-panel">
   <h3 style="text-align:center">Order History Dashboard</h3>
   <div class="summary-container">
@@ -147,33 +201,33 @@ td { color: black; border-bottom: 1px solid #eee; }
     </table>
   </div>
   <button class="action-btn" id="copyTableBtn" style="margin-top: 30px;">⧉ Submit Sales Log</button>
-  <small style="display:block; text-align:center; color:#FFFFFF; margin-top:-10px; margin-bottom:20px; font-size: 12px;">
-    This copies the table to the clipboard and opens the Sales Log. Paste the report into the Sales Log.
-  </small>
 </div>
+
 <button class="action-btn" id="newDayBtn" onclick="startNewDay()">Start a New Day</button>
-<small style="display:block; text-align:center; color:#FFFFFF; margin-top:-10px; margin-bottom:20px; font-size: 12px; font-weight: bold;">
-  ⚠️ Warning: This button will permanently delete all order history and reset the day.
-</small>
+
 <div style="text-align: center; color: white; margin: 40px 0 20px 0; font-family: Arial, sans-serif;">
   <div style="font-size: 16px; font-weight: bold; margin-bottom: 5px;">𝐃𝐮𝐤𝐢𝐤‘𝐬 𝐇𝐮𝐧𝐠𝐫𝐲 𝐇𝐮𝐛</div>
   <div style="font-size: 12px; margin-bottom: 5px;">contact@naydexph.com</div>
-  <div style="font-size: 12px;">
-    <a href="https://facebook.com/dukikshungryhub" target="_blank" style="color: white; text-decoration: underline;">Facebook</a> | 
-    <a href="https://instagram.com/dukikshungryhub" target="_blank" style="color: white; text-decoration: underline;">Instagram</a>
-  </div>
 </div>
+
 <script>
 const MENU_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRUovN3y6yfyLJ0yLVqvrvEEUaipZ3gf6mkuSqJ4oBOg0cEVNwwDs9PC6TH2U0u9kE4a3jEaugquiGg/pub?gid=159409582&output=csv";
 const COMM_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRUovN3y6yfyLJ0yLVqvrvEEUaipZ3gf6mkuSqJ4oBOg0cEVNwwDs9PC6TH2U0u9kE4a3jEaugquiGg/pub?gid=1695333389&output=csv";
+const CREW_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRUovN3y6yfyLJ0yLVqvrvEEUaipZ3gf6mkuSqJ4oBOg0cEVNwwDs9PC6TH2U0u9kE4a3jEaugquiGg/pub?gid=1256574121&output=csv";
+
 let menuData = [];
+let instoreCart = [];
+let currentCrew = "";
+
 async function fetchExternalData() {
     try {
         const menuResponse = await fetch(MENU_URL);
         const menuCsv = await menuResponse.text();
         const menuRows = menuCsv.split('\n').slice(1);
         const refBody = document.getElementById("menuReferenceBody");
+        const instoreProdGrid = document.getElementById("instoreProductButtons");
         refBody.innerHTML = "";
+        instoreProdGrid.innerHTML = "";
         menuData = [];
         menuRows.forEach(row => {
             const columns = row.split(',');
@@ -183,8 +237,15 @@ async function fetchExternalData() {
                 const tr = document.createElement("tr");
                 tr.innerHTML = `<td>${item.type}</td><td>${item.menu}</td><td>${item.code}</td><td>${item.price.toFixed(2)}</td>`;
                 refBody.appendChild(tr);
+
+                const pBtn = document.createElement("button");
+                pBtn.className = "prod-btn";
+                pBtn.innerHTML = `${item.menu} <span>₱${item.price.toFixed(2)}</span>`;
+                pBtn.onclick = () => addToInstoreCart(item.code);
+                instoreProdGrid.appendChild(pBtn);
             }
         });
+
         const commResponse = await fetch(COMM_URL);
         const commCsv = await commResponse.text();
         const commRows = commCsv.split('\n').slice(1);
@@ -199,10 +260,27 @@ async function fetchExternalData() {
                 commSelect.appendChild(opt);
             }
         });
+
+        const crewResponse = await fetch(CREW_URL);
+        const crewCsv = await crewResponse.text();
+        const crewRows = crewCsv.split('\n').slice(1);
+        const crewContainer = document.getElementById("crewButtons");
+        crewContainer.innerHTML = "";
+        crewRows.forEach(row => {
+            const cols = row.split(',');
+            if(cols[1]) {
+                const name = cols[1].trim();
+                const btn = document.createElement("div");
+                btn.className = "login-btn";
+                btn.textContent = name;
+                btn.onclick = () => loginCrew(name);
+                crewContainer.appendChild(btn);
+            }
+        });
+
         const savedDraft = localStorage.getItem("dukiks_draft");
         if(savedDraft) {
             const d = JSON.parse(savedDraft);
-            commInp.value = d.comm || "Home";
             if(d.items && d.items.length > 0) { 
                 orderBody.innerHTML = "";
                 d.items.forEach(item => addOrderRow(item.code, item.qty)); 
@@ -213,6 +291,126 @@ async function fetchExternalData() {
         updateSummary();
     } catch (e) { console.error(e); }
 }
+
+function switchTab(tab) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    if(tab === 'online') {
+        document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
+        document.getElementById('onlineTab').classList.add('active');
+    } else {
+        document.querySelector('.tab-btn:nth-child(2)').classList.add('active');
+        document.getElementById('instoreTab').classList.add('active');
+    }
+}
+
+function loginCrew(name) {
+    currentCrew = name;
+    document.getElementById("loginScreen").style.display = "none";
+    document.getElementById("registerScreen").style.display = "block";
+    document.getElementById("activeCrewDisplay").textContent = "Crew: " + name;
+}
+
+function logoutCrew() {
+    currentCrew = "";
+    document.getElementById("loginScreen").style.display = "block";
+    document.getElementById("registerScreen").style.display = "none";
+}
+
+function addToInstoreCart(code) {
+    const existing = instoreCart.find(i => i.code === code);
+    if(existing) existing.qty++;
+    else instoreCart.push({code: code, qty: 1});
+    renderInstoreTable();
+}
+
+function renderInstoreTable() {
+    const body = document.getElementById("instoreOrderBody");
+    body.innerHTML = "";
+    let grand = 0;
+    instoreCart.forEach((item, index) => {
+        const m = menuData.find(x => x.code === item.code);
+        const total = m.price * item.qty;
+        grand += total;
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${m.menu}</td>
+            <td><input type="number" value="${item.qty}" min="0" style="width:50px" onchange="updateInstoreQty(${index}, this.value)"></td>
+            <td>${formatPHP(total)}</td>
+        `;
+        body.appendChild(tr);
+    });
+    document.getElementById("instoreGrandTotal").textContent = formatPHP(grand);
+    calculateChange();
+}
+
+function updateInstoreQty(index, val) {
+    if(parseInt(val) <= 0) instoreCart.splice(index, 1);
+    else instoreCart[index].qty = parseInt(val);
+    renderInstoreTable();
+}
+
+function calculateChange() {
+    const total = parseFloat(document.getElementById("instoreGrandTotal").textContent.replace(/,/g, ''));
+    const received = parseFloat(document.getElementById("cashReceived").value) || 0;
+    const change = received - total;
+    document.getElementById("changeDue").textContent = formatPHP(change > 0 ? change : 0);
+}
+
+function logInstoreOrder() {
+    if(instoreCart.length === 0) return alert("Add items first!");
+    
+    let ordersCodes = []; let ordersPretty = []; let total = 0;
+    instoreCart.forEach(i => {
+        const item = menuData.find(m => m.code === i.code);
+        ordersCodes.push(`${i.qty}x ${item.code}`);
+        ordersPretty.push(`${i.qty}x ${item.menu}`);
+        total += item.price * i.qty;
+    });
+
+    const now = new Date();
+    const month = (now.getMonth() + 1).toString().padStart(2, '0');
+    const day = now.getDate().toString().padStart(2, '0');
+    const year = now.getFullYear();
+    let hours = now.getHours();
+    const ampm = hours >= 12 ? 'PM' : 'AM'; hours = hours % 12 || 12;
+    const hStr = hours.toString().padStart(2, '0'); const mStr = now.getMinutes().toString().padStart(2, '0'); const sStr = now.getSeconds().toString().padStart(2, '0');
+    const refNum = `${month}${day}${year}-${hStr}${mStr}${sStr}${ampm}`;
+
+    const hRow = document.createElement("tr");
+    hRow.innerHTML = `
+        <td><button class="action-btn" style="width:auto; padding:5px 10px; margin:0; font-size:11px;" onclick="copyOrderSummary(this)">Copy</button></td>
+        <td><button class="action-btn" style="width:auto; padding:5px 10px; margin:0; font-size:11px; background-color:#007bff;" onclick="copyReceipt(this)">Receipt</button></td>
+        <td style="font-weight:bold;">${formatPHP(total)}</td>
+        <td><select class="history-select" data-val="Paid" onchange="saveHistory()"><option>Unpaid</option><option selected>Paid</option></select></td>
+        <td><select class="history-select" data-val="Cash" onchange="saveHistory()"><option>GCash</option><option selected>Cash</option><option>Bank Transfer</option><option>Credit Card</option></select></td>
+        <td>In-store</td>
+        <td>In-store</td>
+        <td>${ordersPretty.join("<br>")}</td>
+        <td>Crew: ${currentCrew}</td>
+        <td style="font-weight:bold; color:#ff6b00;">${refNum}</td>
+        <td style="text-align:center;">
+            <div style="display:flex; align-items:center; justify-content:center;">
+              <button class="edit-btn" onclick="editOrder(this)">✏️</button>
+              <button class="del-btn" onclick="deleteRow(this)">🗑️</button>
+            </div>
+        </td>
+        <th style="display:none">${month}/${day}/${year}</th>
+        <th style="display:none">${hStr}:${mStr} ${ampm}</th>
+        <th style="display:none">${ordersCodes.join(", ")}</th>
+    `;
+    historyBox.appendChild(hRow);
+    saveHistory();
+    
+    instoreCart = [];
+    document.getElementById("cashReceived").value = "";
+    renderInstoreTable();
+    const btn = document.getElementById("logInstoreBtn");
+    btn.textContent = "✅ Sale Logged!";
+    btn.classList.add("success-state");
+    setTimeout(() => { btn.textContent = "Log In-Store Sale"; btn.classList.remove("success-state"); }, 1500);
+}
+
 const orderBody = document.getElementById("orderBody");
 const historyBox = document.getElementById("historyBox");
 const nameInp = document.getElementById("customerName");
@@ -221,6 +419,7 @@ const blkInp = document.getElementById("blockFloor");
 const lotInp = document.getElementById("lotRoom");
 const addrInp = document.getElementById("customerAddress");
 const notesInp = document.getElementById("specialInstructions");
+
 window.onload = () => {
   const saved = localStorage.getItem("dukiks_history");
   if(saved) {
@@ -246,6 +445,7 @@ window.onload = () => {
   updateClock();
   toggleAddressFields();
 };
+
 function saveCurrentDraft() {
     const items = [];
     orderBody.querySelectorAll("tr:not(#grandTotalRow)").forEach(row => {
@@ -256,6 +456,7 @@ function saveCurrentDraft() {
     const draft = { name: nameInp.value, comm: commInp.value, blk: blkInp.value, lot: lotInp.value, addr: addrInp.value, notes: notesInp.value, items: items };
     localStorage.setItem("dukiks_draft", JSON.stringify(draft));
 }
+
 function toggleAddressFields() {
   const subGroup = document.getElementById("subdivisionGroup");
   const homeGroup = document.getElementById("homeAddressGroup");
@@ -267,7 +468,9 @@ function toggleAddressFields() {
     homeGroup.classList.add("hidden-field");
   }
 }
+
 function formatPHP(num) { return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+
 function addOrderRow(selectedCode = "", selectedQty = 1) {
   const tr = document.createElement("tr");
   tr.innerHTML = `
@@ -277,6 +480,7 @@ function addOrderRow(selectedCode = "", selectedQty = 1) {
   `;
   orderBody.appendChild(tr);
 }
+
 function updateTable() {
   let grandTotal = 0;
   const rows = orderBody.querySelectorAll("tr:not(#grandTotalRow)");
@@ -296,11 +500,13 @@ function updateTable() {
   gtRow.innerHTML = `<td colspan="2" style="text-align:right; font-weight:bold;">Grand Total:</td><td style="color:red; font-weight:bold;">${formatPHP(grandTotal)}</td>`;
   orderBody.appendChild(gtRow);
 }
+
 function saveHistory() {
     historyBox.querySelectorAll('select').forEach(sel => { sel.setAttribute('data-val', sel.value); });
     localStorage.setItem("dukiks_history", historyBox.innerHTML);
     updateSummary();
 }
+
 function updateSummary() {
   const rows = historyBox.querySelectorAll("tr");
   let totalSales = 0;
@@ -345,6 +551,7 @@ function updateSummary() {
       `).join('');
   }
 }
+
 document.getElementById("startNewOrderBtn").onclick = function() {
   document.querySelectorAll('.error-bump').forEach(el => el.classList.remove('error-bump'));
   let valid = true;
@@ -406,34 +613,49 @@ document.getElementById("startNewOrderBtn").onclick = function() {
     orderBody.innerHTML = ""; addOrderRow(); updateTable();
   }, 1000);
 };
+
 function editOrder(btn) {
   if(!confirm("Re-enter this order for editing? This will delete the current log entry.")) return;
   const row = btn.closest("tr");
-  nameInp.value = row.cells[5].innerText;
-  notesInp.value = row.cells[8].innerText === '-' ? "" : row.cells[8].innerText;
-  const fullAddr = row.cells[6].innerText;
-  if(fullAddr.includes(" - Blk ")) {
-    const parts = fullAddr.split(" - Blk ");
-    commInp.value = parts[0];
-    const subParts = parts[1].split(", Lot ");
-    blkInp.value = subParts[0];
-    lotInp.value = subParts[1];
+  const nameVal = row.cells[5].innerText;
+  
+  if(nameVal === "In-store") {
+    switchTab('instore');
+    instoreCart = [];
+    const rawItems = row.cells[13].innerText.split(", ");
+    rawItems.forEach(itemStr => {
+        const parts = itemStr.split("x ");
+        if(parts.length === 2) instoreCart.push({code: parts[1].trim(), qty: parseInt(parts[0])});
+    });
+    renderInstoreTable();
   } else {
-    commInp.value = "Home";
-    addrInp.value = fullAddr;
+    switchTab('online');
+    nameInp.value = row.cells[5].innerText;
+    notesInp.value = row.cells[8].innerText === '-' ? "" : row.cells[8].innerText;
+    const fullAddr = row.cells[6].innerText;
+    if(fullAddr.includes(" - Blk ")) {
+      const parts = fullAddr.split(" - Blk ");
+      commInp.value = parts[0];
+      const subParts = parts[1].split(", Lot ");
+      blkInp.value = subParts[0];
+      lotInp.value = subParts[1];
+    } else {
+      commInp.value = "Home";
+      addrInp.value = fullAddr;
+    }
+    toggleAddressFields();
+    const rawItems = row.cells[13].innerText.split(", ");
+    orderBody.innerHTML = "";
+    rawItems.forEach(itemStr => {
+      const parts = itemStr.split("x ");
+      if(parts.length === 2) addOrderRow(parts[1].trim(), parts[0].trim());
+    });
+    updateTable();
   }
-  toggleAddressFields();
-  const rawItems = row.cells[13].innerText.split(", ");
-  orderBody.innerHTML = "";
-  rawItems.forEach(itemStr => {
-    const parts = itemStr.split("x ");
-    if(parts.length === 2) addOrderRow(parts[1].trim(), parts[0].trim());
-  });
-  updateTable();
   row.remove();
   saveHistory();
-  document.getElementById("intakePanel").scrollIntoView({ behavior: 'smooth' });
 }
+
 function copyOrderSummary(btn) {
   const row = btn.closest("tr");
   const refNum = row.cells[9].innerText; const dateStr = row.cells[11].innerText;
@@ -461,6 +683,7 @@ function copyOrderSummary(btn) {
   const ot = btn.innerText; btn.innerText = "✅";
   setTimeout(() => { btn.innerText = ot; }, 1500);
 }
+
 function copyReceipt(btn) {
   const row = btn.closest("tr"); const total = row.cells[2].innerText;
   const ordersRaw = row.cells[13].innerText;
@@ -471,8 +694,10 @@ function copyReceipt(btn) {
   const ot = btn.innerText; btn.innerText = "✅"; btn.style.backgroundColor = "#28a745";
   setTimeout(() => { btn.innerText = ot; btn.style.backgroundColor = "#007bff"; }, 1500);
 }
+
 function deleteRow(btn) { if(confirm("Delete this order?")) { btn.closest("tr").remove(); saveHistory(); } }
 function startNewDay() { if(confirm("Reset all data?")) { localStorage.clear(); historyBox.innerHTML = ""; updateSummary(); location.reload(); } }
+
 document.getElementById("copyTableBtn").onclick = function() {
   let text = "";
   historyBox.querySelectorAll("tr").forEach(r => {
@@ -483,6 +708,7 @@ document.getElementById("copyTableBtn").onclick = function() {
   window.location.href = "googlesheets://https://docs.google.com/spreadsheets/d/1Y0fxsaI3jva56h42jg9jRq1FS6vmbXmxl5X2e-cc69I/edit?gid=1589209915#gid=1589209915";
   setTimeout(() => { if (document.hasFocus()) { window.open("https://docs.google.com/spreadsheets/d/1Y0fxsaI3jva56h42jg9jRq1FS6vmbXmxl5X2e-cc69I/edit?gid=1589209915#gid=1589209915", "_blank"); } }, 500);
 };
+
 function updateClock() {
   const now = new Date();
   const t = document.getElementById('timePHT'); const d = document.getElementById('datePHT');
