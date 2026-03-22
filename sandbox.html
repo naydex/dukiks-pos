@@ -31,7 +31,7 @@ td { color: black; border-bottom: 1px solid #eee; }
 .input-row { display: flex; flex-direction: column; margin-bottom: 12px; max-width: 850px; margin: 0 auto 12px auto; }
 .input-row label { font-weight: bold; color: black; margin-bottom: 5px; font-size: 14px;}
 .input-row input, .input-row select { padding: 8px; font-size: 16px; border: 2px solid #ccc; border-radius: 8px; transition: all 0.3s; width: 100%; box-sizing: border-box; }
-.side-by-side { display: flex; gap: 10px; justify-content: flex-start; max-width: 850px; margin: 0 auto 12px auto; align-items: flex-start; }
+.side-by-side { display: flex; gap: 10px; justify-content: center; max-width: 850px; margin: 0 auto 12px auto; align-items: flex-start; }
 .side-by-side .input-row { flex: 0 0 auto; margin: 0; }
 .small-input { width: 80px !important; }
 .hidden-field { display: none; }
@@ -59,9 +59,9 @@ td { color: black; border-bottom: 1px solid #eee; }
 .required-star { color: #ff3b30; font-size: 12px; margin-left: 4px; }
 .error-bump { border: 2px solid #ff3b30 !important; animation: shake 0.4s ease-in-out; }
 @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-5px); } }
-.product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px; }
-.category-title { grid-column: 1 / -1; background: #000; color: #ff6b00; padding: 5px 15px; border-radius: 8px; font-size: 14px; font-weight: bold; margin-top: 10px; text-align: center; }
-.prod-btn { background: #ff6b00; border: none; color: white; padding: 15px 10px; border-radius: 12px; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; box-shadow: 0 5px #b34a00; transition: all 0.1s; position: relative; top: 0; }
+.product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px; justify-items: center; justify-content: center; }
+.category-title { grid-column: 1 / -1; background: #000; color: #ff6b00; padding: 5px 15px; border-radius: 8px; font-size: 14px; font-weight: bold; margin-top: 10px; text-align: center; width: 100%; box-sizing: border-box; }
+.prod-btn { width: 140px; background: #ff6b00; border: none; color: white; padding: 15px 10px; border-radius: 12px; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; box-shadow: 0 5px #b34a00; transition: all 0.1s; position: relative; top: 0; }
 .prod-btn:active { top: 3px; box-shadow: 0 2px #b34a00; }
 .prod-btn.clicked { background: #4cd964 !important; box-shadow: 0 5px #38a84d !important; }
 .prod-btn span { font-size: 11px; color: #ff0000; margin-top: 5px; background: white; padding: 2px 6px; border-radius: 4px; font-weight: 900; }
@@ -78,13 +78,12 @@ td { color: black; border-bottom: 1px solid #eee; }
 .login-btn.pos-choice:active { box-shadow: 0 2px #333; }
 .crew-timestamp { text-align: center; color: white; font-size: 13px; margin-top: 5px; margin-bottom: 15px; }
 .item-del-btn { background:none; border:none; color:red; cursor:pointer; font-size:18px; padding:0 5px; }
-
 .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-top: 10px; width: 100%; max-width: 250px; }
 .numpad button { padding: 12px; font-size: 16px; font-weight: bold; border-radius: 8px; border: 1px solid #ccc; background: white; cursor: pointer; color: black; box-shadow: 0 2px #ddd; }
 .numpad button:active { transform: translateY(2px); box-shadow: none; }
-.numpad .wide { grid-column: span 1; }
 .numpad .special { background: #333; color: white; font-size: 12px; }
 .numpad .exact { background: #4cd964; color: white; font-size: 11px; }
+#cashReceived { font-size: 24px !important; font-weight: bold; }
 </style>
 </head>
 <body>
@@ -129,8 +128,8 @@ td { color: black; border-bottom: 1px solid #eee; }
         </div>
         <div id="subdivisionGroup" class="hidden-field side-by-side">
           <div>
-            <div class="input-row"><label>BLK/Floor <span class="required-star">*</span></label><input type="text" id="blockFloor" class="small-input" placeholder="000" oninput="this.value = this.value.replace(/[^0-9]/g, '').substring(0,4); saveCurrentDraft();" onfocus="setCurrentNumpadTarget('blockFloor')"></div>
-            <div class="input-row"><label>Lot/Room <span class="required-star">*</span></label><input type="text" id="lotRoom" class="small-input" placeholder="000" oninput="this.value = this.value.replace(/[^0-9]/g, '').substring(0,4); saveCurrentDraft();" onfocus="setCurrentNumpadTarget('lotRoom')"></div>
+            <div class="input-row"><label>BLK/Floor <span class="required-star">*</span></label><input type="text" id="blockFloor" class="small-input" placeholder="000" oninput="limitDigits(this, 4); autoSwitchOnlineTarget(); saveCurrentDraft();" onfocus="setCurrentNumpadTarget('blockFloor')"></div>
+            <div class="input-row"><label>Lot/Room <span class="required-star">*</span></label><input type="text" id="lotRoom" class="small-input" placeholder="000" oninput="limitDigits(this, 4); saveCurrentDraft();" onfocus="setCurrentNumpadTarget('lotRoom')"></div>
           </div>
           <div class="numpad" style="max-width:180px;">
             <button class="special" onclick="numpadInput('X')">X</button>
@@ -144,9 +143,7 @@ td { color: black; border-bottom: 1px solid #eee; }
         <div id="homeAddressGroup">
           <div class="input-row"><label>Home Address <span class="required-star">*</span></label><input type="text" id="customerAddress" placeholder="Street / Barangay / Landmark" oninput="saveCurrentDraft()"></div>
         </div>
-
         <div id="onlineProductButtons" class="product-grid" style="margin-top:20px;"></div>
-
         <table class="order-table">
           <thead><tr><th>Order <span class="required-star">*</span></th><th>Qty</th><th>Price</th><th></th></tr></thead>
           <tbody id="onlineOrderBody"></tbody>
@@ -154,7 +151,6 @@ td { color: black; border-bottom: 1px solid #eee; }
         <div class="input-row"><label>Notes</label><input type="text" id="specialInstructions" placeholder="Special Instructions" oninput="saveCurrentDraft()"></div>
         <button class="action-btn" id="logOnlineBtn" onclick="logOnlineOrder()">Log Order & Clear</button>
       </div>
-
       <div class="panel history-panel">
           <h3 style="text-align:center">Online Order History Dashboard</h3>
           <div class="summary-container">
@@ -188,7 +184,7 @@ td { color: black; border-bottom: 1px solid #eee; }
             <div class="calculator-box" id="calcBox">
                 <div class="calc-row"><span>Grand Total:</span><span id="instoreGrandTotal">0.00</span></div>
                 <div class="calc-row" style="border-top: 1px solid #ccc; padding-top:10px;"><span>Change:</span><span id="changeDue" class="change-amt">0.00</span></div>
-                <div class="calc-row"><span>Cash Received: <span class="required-star">*</span></span><input type="number" id="cashReceived" style="width:120px;" oninput="calculateChange(); saveCurrentDraft();" onfocus="setCurrentNumpadTarget('cashReceived')"></div>
+                <div class="calc-row"><span>Cash Received: <span class="required-star">*</span></span><input type="number" id="cashReceived" step="0.01" style="width:140px;" oninput="validateDecimal(this); calculateChange(); saveCurrentDraft();" onfocus="setCurrentNumpadTarget('cashReceived')"></div>
                 <div style="display: flex; justify-content: flex-end;">
                   <div class="numpad">
                     <button class="special" onclick="numpadInput('X')">X</button>
@@ -203,7 +199,6 @@ td { color: black; border-bottom: 1px solid #eee; }
             </div>
             <button class="action-btn" id="logInstoreBtn" onclick="logInstoreOrder()">Log Order & Clear</button>
         </div>
-
         <div class="panel history-panel">
             <h3 style="text-align:center">In-Store Order History Dashboard</h3>
             <div class="summary-container">
@@ -231,13 +226,9 @@ td { color: black; border-bottom: 1px solid #eee; }
     </div>
 </div>
 
-<div style="text-align: center; color: white; margin: 40px 0 20px 0; font-family: Arial, sans-serif;">
+<div style="text-align: center; color: white; margin: 40px 0 20px 0;">
   <div style="font-size: 16px; font-weight: bold; margin-bottom: 5px;">𝐃𝐮𝐤𝐢𝐤‘𝐬 𝐇𝐮𝐧𝐠𝐫𝐲 𝐇𝐮𝐛</div>
   <div style="font-size: 12px; margin-bottom: 5px;">contact@naydexph.com</div>
-  <div style="font-size: 12px;">
-    <a href="https://facebook.com/dukikshungryhub" target="_blank" style="color: white; text-decoration: underline;">Facebook</a> | 
-    <a href="https://instagram.com/dukikshungryhub" target="_blank" style="color: white; text-decoration: underline;">Instagram</a>
-  </div>
 </div>
 
 <script>
@@ -256,10 +247,8 @@ async function init() {
             fetch(COMM_URL).then(r => r.text()),
             fetch(CREW_URL).then(r => r.text())
         ]);
-
         menuOnline = on.split('\n').slice(1).map(r => { const c = r.split(','); return c.length >= 4 ? {type: c[0].trim(), menu: c[1].trim(), code: c[2].trim(), price: parseFloat(c[3])} : null; }).filter(x => x);
         menuInstore = ins.split('\n').slice(1).map(r => { const c = r.split(','); return c.length >= 4 ? {type: c[0].trim(), menu: c[1].trim(), code: c[2].trim(), price: parseFloat(c[3])} : null; }).filter(x => x);
-
         const buildGrid = (data, targetId, cartName) => {
             const grid = document.getElementById(targetId);
             const cats = [...new Set(data.map(i => i.type))];
@@ -272,24 +261,19 @@ async function init() {
         };
         buildGrid(menuOnline, "onlineProductButtons", "online");
         buildGrid(menuInstore, "instoreProductButtons", "instore");
-
         const commS = document.getElementById("communitySelect");
         com.split('\n').slice(1).forEach(r => { if(r.trim()) commS.innerHTML += `<option value="${r.trim()}">${r.trim()}</option>`; });
-
         const crewG = document.getElementById("crewSelection");
         crw.split('\n').slice(1).forEach(r => {
             const c = r.split(',');
             if(c[1]) {
-                const name = c[1].trim();
-                const pass = c[2] ? c[2].trim() : "";
+                const name = c[1].trim(); const pass = c[2] ? c[2].trim() : "";
                 crewList.push({name: name, password: pass});
-                crewG.innerHTML += `<div class="login-btn" style="background:#ff6b00; color:white; box-shadow: 0 6px #b34a00;" onclick="finalizeLogin('${name}')">${name}</div>`;
+                crewG.innerHTML += `<div class="login-btn" onclick="finalizeLogin('${name}')">${name}</div>`;
             }
         });
-
         const s1 = localStorage.getItem("dukiks_history"); if(s1) { document.getElementById("historyBox").innerHTML = s1; restoreSelects("historyBox"); }
         const s2 = localStorage.getItem("dukiks_history_in"); if(s2) { document.getElementById("instoreHistoryBox").innerHTML = s2; restoreSelects("instoreHistoryBox"); }
-        
         loadSession();
         updateSummary();
     } catch (e) { console.error(e); }
@@ -299,6 +283,7 @@ function setPosType(type) {
     selectedType = type;
     document.querySelectorAll('.pos-choice').forEach(b => b.classList.remove('active'));
     document.getElementById(type === 'online' ? 'btnOnline' : 'btnInstore').classList.add('active');
+    currentNumpadTarget = type === 'online' ? 'blockFloor' : 'cashReceived';
     saveCurrentDraft();
 }
 
@@ -319,6 +304,7 @@ function showMain(name, type) {
     document.getElementById("mainContainer").style.display = "block";
     document.getElementById("onlinePOS").style.display = type === 'online' ? "block" : "none";
     document.getElementById("instorePOS").style.display = type === 'instore' ? "block" : "none";
+    currentNumpadTarget = type === 'online' ? 'blockFloor' : 'cashReceived';
     const now = new Date();
     document.getElementById("crewHeaderDisplay").textContent = `Logged in: ${name} | ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`;
 }
@@ -401,8 +387,7 @@ function renderCart(type) {
     cart.forEach((item, idx) => {
         const m = menu.find(x => x.code === item.code);
         if(!m) return;
-        const total = m.price * item.qty;
-        grand += total;
+        const total = m.price * item.qty; grand += total;
         body.innerHTML += `<tr><td>${m.menu}</td><td><input type="number" value="${item.qty}" min="0" style="width:50px" onchange="updateQty('${type}', ${idx}, this.value)"></td><td>${formatPHP(total)}</td><td><button class="item-del-btn" onclick="removeFromCart('${type}', ${idx})">❌</button></td></tr>`;
     });
     if(type === 'instore') {
@@ -434,16 +419,13 @@ function logOnlineOrder() {
     if(comm.value === "Home") { if(!addr.value.trim()) { addr.classList.add("error-bump"); valid = false; } }
     else { if(!blk.value.trim()) { blk.classList.add("error-bump"); valid = false; } if(!lot.value.trim()) { lot.classList.add("error-bump"); valid = false; } }
     if(!valid || onlineCart.length === 0) { document.getElementById("validationError").style.display = "block"; return; }
-
     const now = new Date();
     const dStr = `${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getDate().toString().padStart(2,'0')}/${now.getFullYear()}`;
     const tStr = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
     const ref = dStr.replace(/\//g,'') + "-" + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'}).replace(/[: ]/g,'');
     const fullAddr = (comm.value === "Home") ? addr.value : `${comm.value} - Blk ${blk.value}, Lot ${lot.value}`;
-    
     let codes = [], pretty = [], total = 0;
     onlineCart.forEach(i => { const m = menuOnline.find(x => x.code === i.code); codes.push(`${i.qty}x ${m.code}`); pretty.push(`${i.qty}x ${m.menu}`); total += m.price * i.qty; });
-
     const tr = document.createElement("tr");
     tr.innerHTML = `<td><button class="action-btn" style="width:auto; padding:5px 10px; margin:0; font-size:11px;" onclick="copySummary(this, false)">Copy</button></td>
         <td><button class="action-btn" style="width:auto; padding:5px 10px; margin:0; font-size:11px; background-color:#007bff;" onclick="copyReceipt(this, false)">Receipt</button></td>
@@ -454,8 +436,7 @@ function logOnlineOrder() {
         <td><div style="display:flex;"><button class="edit-btn" onclick="editOrder(this, false)">✏️</button><button class="del-btn" onclick="deleteRow(this)">🗑️</button></div></td>
         <th style="display:none">${dStr}</th><th style="display:none">${tStr}</th><th style="display:none">${codes.join(", ")}</th><th style="display:none">${currentCrew}</th>`;
     document.getElementById("historyBox").prepend(tr);
-    saveHistory();
-    copySummary(tr.querySelector('button'), false);
+    saveHistory(); copySummary(tr.querySelector('button'), false);
     onlineCart = []; renderCart('online');
     name.value = ""; blk.value = ""; lot.value = ""; addr.value = ""; document.getElementById("specialInstructions").value = "";
     saveCurrentDraft();
@@ -477,15 +458,12 @@ function logInstoreOrder() {
     const cash = document.getElementById("cashReceived");
     if(!cash.value) { cash.classList.add("error-bump"); return; }
     if(calculateChange() < 0 || instoreCart.length === 0) { return; }
-    
     const now = new Date();
     const dStr = `${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getDate().toString().padStart(2,'0')}/${now.getFullYear()}`;
     const tStr = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
     const ref = dStr.replace(/\//g,'') + "-" + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'}).replace(/[: ]/g,'');
-    
     let codes = [], pretty = [], total = 0;
     instoreCart.forEach(i => { const m = menuInstore.find(x => x.code === i.code); codes.push(`${i.qty}x ${m.code}`); pretty.push(`${i.qty}x ${m.menu}`); total += m.price * i.qty; });
-
     const tr = document.createElement("tr");
     tr.innerHTML = `<td><button class="action-btn" style="width:auto; padding:5px 10px; margin:0; font-size:11px; background-color:#007bff;" onclick="copyReceipt(this, true)">Receipt</button></td>
         <td>${currentCrew}</td><td style="font-weight:bold;">${formatPHP(total)}</td><td>${formatPHP(parseFloat(cash.value))}</td><td>${formatPHP(calculateChange())}</td>
@@ -493,8 +471,7 @@ function logInstoreOrder() {
         <td><div style="display:flex;"><button class="edit-btn" onclick="editOrder(this, true)">✏️</button><button class="del-btn" onclick="deleteRow(this)">🗑️</button></div></td>
         <th style="display:none">In-store</th><th style="display:none">In-store</th><th style="display:none">${dStr}</th><th style="display:none">${tStr}</th><th style="display:none">${codes.join(", ")}</th><th style="display:none">Paid</th><th style="display:none">Cash</th>`;
     document.getElementById("instoreHistoryBox").prepend(tr);
-    saveHistory();
-    instoreCart = []; renderCart('instore');
+    saveHistory(); instoreCart = []; renderCart('instore');
     cash.value = ""; document.getElementById("instoreNotes").value = "";
     saveCurrentDraft();
     document.getElementById("logInstoreBtn").textContent = "✅ Logged!";
@@ -520,8 +497,7 @@ function updateSummary() {
                 itemsRaw.split(', ').forEach(s => {
                     const p = s.split('x ');
                     if(p.length > 1) {
-                        const q = parseInt(p[0]) || 0;
-                        const m = menu.find(x => x.code === p[1]);
+                        const q = parseInt(p[0]) || 0; const m = menu.find(x => x.code === p[1]);
                         if(m) {
                             const name = m.menu;
                             if (name.includes("Fried Chicken")) itemCounts["Fried Chicken"] += q;
@@ -544,7 +520,6 @@ function updateSummary() {
         const displayOrder = ["Fried Chicken", "Pork Steak", "Pork Chop", "Vegetable Lumpia", "Pork Lumpia", "Rice"];
         breakdown.innerHTML = displayOrder.map(n => `<div style="display:flex; justify-content:space-between; border-bottom:1px solid #333; padding:5px 0;"><span style="font-size:11px; color: #ddd;"><span style="color:#ff6b00; font-weight:bold; font-size:14px; margin-right:5px;">${itemCounts[n] || 0}</span> ${n.toUpperCase()}</span></div>`).join('');
     };
-
     const processInstore = () => {
         const box = document.getElementById("instoreHistoryBox");
         let sales = 0, counts = {};
@@ -556,8 +531,7 @@ function updateSummary() {
                 itemsRaw.split(', ').forEach(s => {
                     const p = s.split('x ');
                     if(p.length > 1) {
-                        const q = parseInt(p[0]) || 0;
-                        const m = menuInstore.find(x => x.code === p[1]);
+                        const q = parseInt(p[0]) || 0; const m = menuInstore.find(x => x.code === p[1]);
                         if(m) counts[m.menu] = (counts[m.menu] || 0) + q;
                     }
                 });
@@ -571,7 +545,6 @@ function updateSummary() {
         const breakdown = document.getElementById("instoreItemBreakdown");
         breakdown.innerHTML = Object.keys(counts).map(n => `<div style="display:flex; justify-content:space-between; border-bottom:1px solid #333; padding:5px 0;"><span style="font-size:11px; color: #ddd;"><span style="color:#ff6b00; font-weight:bold; font-size:14px; margin-right:5px;">${counts[n]}</span> ${n.toUpperCase()}</span></div>`).join('');
     };
-
     processOnline("historyBox", "on_", menuOnline);
     processInstore();
 }
@@ -609,29 +582,21 @@ function copySummary(btn, isIn) {
     const total = row.cells[2].innerText;
     const notes = row.cells[isIn ? 6 : 8].innerText;
     const ordersRaw = row.cells[isIn ? 14 : 13].innerText;
-
     let shortAddr = "";
     if(addr.includes(" - Blk ")) {
-        const parts = addr.split(" - Blk ");
-        const commCode = parts[0].substring(0, 3).toUpperCase();
-        const subParts = parts[1].split(", Lot ");
-        shortAddr = `${commCode} ${subParts[0]}/${subParts[1]}`;
-    } else {
-        shortAddr = addr;
-    }
-
+        const parts = addr.split(" - Blk "); const commCode = parts[0].substring(0, 3).toUpperCase();
+        const subParts = parts[1].split(", Lot "); shortAddr = `${commCode} ${subParts[0]}/${subParts[1]}`;
+    } else { shortAddr = addr; }
     const orderCodes = ordersRaw.split(", ");
     const menuRef = isIn ? menuInstore : menuOnline;
     const fullOrderNames = orderCodes.map(item => { const parts = item.split("x "); const q = parts[0]; const c = parts[1]; const m = menuRef.find(x => x.code === c); return `${q}x ${m ? m.menu : c}`; }).join("\n");
     const summary = `${refNum}\n${dateStr} ${timeStr}\nName: ${name}\nAddress: ${addr}\n\n${shortAddr} ₱${total}\n\nOrders:\n${fullOrderNames}\n\nSpecial Notes: ${notes}`;
-    
     navigator.clipboard.writeText(summary);
     if(!isIn) {
         window.location.href = "fb-messenger://user-thread/1629578618166443";
         setTimeout(() => { if (document.hasFocus()) { window.open("https://www.messenger.com/t/1629578618166443", "_blank"); } }, 500);
     }
-    const ot = btn.innerText; btn.innerText = "✅";
-    setTimeout(() => { btn.innerText = ot; }, 1500);
+    const ot = btn.innerText; btn.innerText = "✅"; setTimeout(() => { btn.innerText = ot; }, 1500);
 }
 
 function copyReceipt(btn, isIn) {
@@ -681,18 +646,49 @@ function formatPHP(n) { return n.toLocaleString('en-US', { minimumFractionDigits
 function updateClock() { const n = new Date(); let h = n.getHours(); const a = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12; document.getElementById('timePHT').textContent = `${h.toString().padStart(2,'0')}:${n.getMinutes().toString().padStart(2,'0')}:${n.getSeconds().toString().padStart(2,'0')} ${a}`; document.getElementById('datePHT').textContent = n.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'2-digit', year:'numeric'}); }
 
 function setCurrentNumpadTarget(id) { currentNumpadTarget = id; }
+
+function limitDigits(el, max) { el.value = el.value.replace(/[^0-9]/g, '').substring(0, max); }
+
+function autoSwitchOnlineTarget() {
+  const blk = document.getElementById("blockFloor");
+  if(blk.value.length >= 3) {
+    currentNumpadTarget = "lotRoom";
+    document.getElementById("lotRoom").focus();
+  }
+}
+
+function validateDecimal(el) {
+  const val = el.value;
+  if(val.includes('.')) {
+    const parts = val.split('.');
+    if(parts[1].length > 2) {
+      el.value = parseFloat(val).toFixed(2);
+    }
+  }
+}
+
 function numpadInput(val) {
-  if(!currentNumpadTarget) return;
+  if(!currentNumpadTarget) {
+    currentNumpadTarget = selectedType === 'online' ? 'blockFloor' : 'cashReceived';
+  }
   const target = document.getElementById(currentNumpadTarget);
+  if(!target) return;
+
   if(val === 'X') { target.value = target.value.slice(0, -1); }
   else if(val === 'C') { target.value = ''; }
   else if(val === 'E') { 
     const gt = document.getElementById("instoreGrandTotal").textContent.replace(/,/g, '');
     target.value = gt;
   }
-  else { target.value += val; }
+  else {
+    if(currentNumpadTarget === 'cashReceived' && val === '.' && target.value.includes('.')) return;
+    target.value += val;
+  }
   
-  if(currentNumpadTarget === 'cashReceived') calculateChange();
+  if(currentNumpadTarget === 'cashReceived') { validateDecimal(target); calculateChange(); }
+  if(currentNumpadTarget === 'blockFloor') { limitDigits(target, 4); autoSwitchOnlineTarget(); }
+  if(currentNumpadTarget === 'lotRoom') { limitDigits(target, 4); }
+  
   saveCurrentDraft();
 }
 
