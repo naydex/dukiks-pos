@@ -63,6 +63,7 @@ td { color: black; border-bottom: 1px solid #eee; }
 .category-title { grid-column: 1 / -1; background: #000; color: #ff6b00; padding: 5px 15px; border-radius: 8px; font-size: 14px; font-weight: bold; margin-top: 10px; }
 .prod-btn { background: #ff6b00; border: none; color: white; padding: 15px 10px; border-radius: 12px; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; box-shadow: 0 5px #b34a00; transition: all 0.1s; position: relative; top: 0; }
 .prod-btn:active { top: 3px; box-shadow: 0 2px #b34a00; }
+.prod-btn.clicked { background: #4cd964 !important; box-shadow: 0 5px #38a84d !important; }
 .prod-btn span { font-size: 10px; color: #fff; margin-top: 5px; opacity: 0.8; }
 .calculator-box { background: #f0f0f0; padding: 15px; border-radius: 12px; margin-top: 20px; border: 1px solid #ccc; }
 .calc-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 18px; font-weight: bold; }
@@ -237,7 +238,7 @@ async function init() {
             cats.forEach(cat => {
                 grid.innerHTML += `<div class="category-title">${cat.toUpperCase()}</div>`;
                 data.filter(i => i.type === cat).forEach(i => {
-                    grid.innerHTML += `<button class="prod-btn" onclick="addToCart('${cartName}', '${i.code}')">${i.menu}<span>₱${i.price.toFixed(2)}</span></button>`;
+                    grid.innerHTML += `<button class="prod-btn" onclick="addToCart('${cartName}', '${i.code}', this)">${i.menu}<span>₱${i.price.toFixed(2)}</span></button>`;
                 });
             });
         };
@@ -270,6 +271,8 @@ function setPosType(type) {
 
 function finalizeLogin(name) {
     if(!selectedType) { alert("Please select POS Type first!"); return; }
+    const pass = prompt("Enter Password for " + name + ":");
+    if(pass !== "dukiks2026") { alert("Incorrect Password!"); return; }
     currentCrew = name;
     localStorage.setItem("dukiks_session", JSON.stringify({crew: name, type: selectedType}));
     showMain(name, selectedType);
@@ -334,12 +337,16 @@ function saveCurrentDraft() {
     localStorage.setItem("dukiks_draft", JSON.stringify(draft));
 }
 
-function addToCart(type, code) {
+function addToCart(type, code, btn) {
     const cart = type === 'online' ? onlineCart : instoreCart;
     const item = cart.find(i => i.code === code);
     if(item) item.qty++; else cart.push({code: code, qty: 1});
     renderCart(type);
     saveCurrentDraft();
+    if(btn) {
+      btn.classList.add('clicked');
+      setTimeout(() => btn.classList.remove('clicked'), 200);
+    }
 }
 
 function removeFromCart(type, idx) {
@@ -542,7 +549,7 @@ function submitSalesLog(type) {
         });
     } else {
         document.getElementById("instoreHistoryBox").querySelectorAll("tr").forEach(r => {
-            const rowData = [r.cells[7].innerText, new Date(r.cells[11].innerText).toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'}), r.cells[12].innerText, "In-Store", "Counter", r.cells[2].innerText, r.cells[14].innerText, r.cells[15].innerText, r.cells[13].innerText, r.cells[6].innerText, r.cells[1].innerText];
+            const rowData = [r.cells[8].innerText, new Date(r.cells[12].innerText).toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'}), r.cells[13].innerText, "In-Store", "Counter", r.cells[2].innerText, r.cells[15].innerText, r.cells[16].innerText, r.cells[14].innerText, r.cells[6].innerText, r.cells[1].innerText];
             t += rowData.join("\t") + "\n";
         });
     }
@@ -553,13 +560,13 @@ function submitSalesLog(type) {
 
 function copySummary(btn, isIn) {
     const row = btn.closest("tr");
-    const refNum = row.cells[9].innerText; const dateStr = row.cells[11].innerText;
-    const timeStr = row.cells[12].innerText;
+    const refNum = row.cells[isIn ? 8 : 9].innerText; const dateStr = row.cells[isIn ? 12 : 11].innerText;
+    const timeStr = row.cells[isIn ? 13 : 12].innerText;
     const name = isIn ? "Walk-in" : row.cells[5].innerText; 
     const addr = isIn ? "Counter" : row.cells[6].innerText; 
     const total = row.cells[2].innerText;
     const notes = row.cells[isIn ? 6 : 8].innerText;
-    const ordersRaw = row.cells[13].innerText;
+    const ordersRaw = row.cells[isIn ? 14 : 13].innerText;
 
     let shortAddr = "";
     if(addr.includes(" - Blk ")) {
@@ -587,19 +594,22 @@ function copySummary(btn, isIn) {
 
 function copyReceipt(btn, isIn) {
     const r = btn.closest("tr");
-    const items = r.cells[13].innerText.split(', ').map(s => { const p = s.split('x '); const m = (isIn ? menuInstore : menuOnline).find(x => x.code === p[1]); return `${p[0]}x ${m ? m.menu : p[1]}`; }).join('\n');
+    const items = r.cells[isIn ? 14 : 13].innerText.split(', ').map(s => { const p = s.split('x '); const m = (isIn ? menuInstore : menuOnline).find(x => x.code === p[1]); return `${p[0]}x ${m ? m.menu : p[1]}`; }).join('\n');
     navigator.clipboard.writeText(`${items}\nTotal Amount: ₱${r.cells[2].innerText}`);
     btn.innerText = "✅"; setTimeout(() => btn.innerText = "Receipt", 1000);
 }
 
 function editOrder(btn, isIn) {
     if(!confirm("Edit? This deletes entry.")) return;
-    const r = btn.closest("tr"); const codes = r.cells[13].innerText.split(", ");
+    const r = btn.closest("tr"); 
     if(isIn) { 
+        const codes = r.cells[14].innerText.split(", ");
         instoreCart = []; codes.forEach(s => { const p = s.split("x "); instoreCart.push({code: p[1], qty: parseInt(p[0])}); }); 
         renderCart('instore'); 
         document.getElementById("instoreNotes").value = r.cells[6].innerText; 
+        document.getElementById("cashReceived").value = r.cells[3].innerText.replace(/,/g, '');
     } else { 
+        const codes = r.cells[13].innerText.split(", ");
         onlineCart = []; codes.forEach(s => { const p = s.split("x "); onlineCart.push({code: p[1], qty: parseInt(p[0])}); }); 
         renderCart('online'); 
         document.getElementById("customerName").value = r.cells[5].innerText; 
