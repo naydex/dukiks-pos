@@ -76,7 +76,9 @@ td { color: black; border-bottom: 1px solid #eee; }
 .change-amt { color: #28a745; font-size: 24px; }
 .change-warning { color: #ff3b30 !important; }
 .calc-error { background: #ffebeb; border: 2px solid #ff3b30; }
-.crew-timestamp { text-align: center; color: white; font-size: 13px; margin-top: -15px; margin-bottom: 15px; }
+.crew-timestamp { text-align: center; color: white; font-size: 13px; margin-top: 5px; margin-bottom: 15px; }
+.social-links { font-size: 12px; margin-top: 10px; }
+.social-links a { color: white; text-decoration: underline; margin: 0 10px; }
 </style>
 </head>
 <body>
@@ -92,8 +94,8 @@ td { color: black; border-bottom: 1px solid #eee; }
 
 <div id="mainPOS" style="display:none;">
     <div class="tab-container">
-      <button class="tab-btn active" onclick="switchTab('online')">Online POS</button>
-      <button class="tab-btn" onclick="switchTab('instore')">In-Store POS</button>
+      <button class="tab-btn active" id="onlineTabBtn" onclick="switchTab('online')">Online POS</button>
+      <button class="tab-btn" id="instoreTabBtn" onclick="switchTab('instore')">In-Store POS</button>
     </div>
 
     <div class="logo-container">
@@ -115,28 +117,28 @@ td { color: black; border-bottom: 1px solid #eee; }
         <div id="validationError" class="error-msg">⚠️ Please check Name, Address, and Items!</div>
         <div class="input-row">
           <label>Name <span class="required-star">*</span></label>
-          <input type="text" id="customerName" placeholder="Customer Name" oninput="saveCurrentDraft()">
+          <input type="text" id="customerName" placeholder="Customer Name">
         </div>
         <div class="input-row">
           <label>Community <span class="required-star">*</span></label>
-          <select id="communitySelect" onchange="toggleAddressFields(); saveCurrentDraft();">
+          <select id="communitySelect" onchange="toggleAddressFields();">
               <option value="Home">Home Address (Not a Subdivision)</option>
           </select>
         </div>
         <div id="subdivisionGroup" class="hidden-field side-by-side">
           <div class="input-row">
             <label>BLK/Floor <span class="required-star">*</span></label>
-            <input type="text" id="blockFloor" class="small-input" placeholder="000" oninput="this.value = this.value.replace(/[^0-9]/g, '').substring(0,4); saveCurrentDraft();">
+            <input type="text" id="blockFloor" class="small-input" placeholder="000" oninput="this.value = this.value.replace(/[^0-9]/g, '').substring(0,4);">
           </div>
           <div class="input-row">
             <label>Lot/Room <span class="required-star">*</span></label>
-            <input type="text" id="lotRoom" class="small-input" placeholder="000" oninput="this.value = this.value.replace(/[^0-9]/g, '').substring(0,4); saveCurrentDraft();">
+            <input type="text" id="lotRoom" class="small-input" placeholder="000" oninput="this.value = this.value.replace(/[^0-9]/g, '').substring(0,4);">
           </div>
         </div>
         <div id="homeAddressGroup">
           <div class="input-row">
             <label>Home Address <span class="required-star">*</span></label>
-            <input type="text" id="customerAddress" placeholder="Street / Barangay / Landmark" oninput="saveCurrentDraft()">
+            <input type="text" id="customerAddress" placeholder="Street / Barangay / Landmark">
           </div>
         </div>
         <table class="order-table" id="orderTable">
@@ -145,14 +147,14 @@ td { color: black; border-bottom: 1px solid #eee; }
         </table>
         <div class="input-row">
           <label>Notes</label>
-          <input type="text" id="specialInstructions" placeholder="Special Instructions" oninput="saveCurrentDraft()">
+          <input type="text" id="specialInstructions" placeholder="Special Instructions">
         </div>
         <button class="action-btn" id="startNewOrderBtn">Log Order & Clear</button>
       </div>
 
       <div class="panel history-panel">
           <h3 style="text-align:center">Online Order History</h3>
-          <div class="summary-container" id="onlineSummary">
+          <div class="summary-container">
             <div class="summary-card"><div>Orders</div><span id="on_totalOrders">0</span></div>
             <div class="summary-card"><div>Sales</div><span id="on_totalSales">0.00</span></div>
             <div class="summary-card"><div>Best Seller</div><span id="on_bestSeller">None</span></div>
@@ -187,7 +189,7 @@ td { color: black; border-bottom: 1px solid #eee; }
 
         <div class="panel history-panel">
             <h3 style="text-align:center">In-Store Order History</h3>
-            <div class="summary-container" id="instoreSummary">
+            <div class="summary-container">
               <div class="summary-card"><div>Orders</div><span id="in_totalOrders">0</span></div>
               <div class="summary-card"><div>Sales</div><span id="in_totalSales">0.00</span></div>
               <div class="summary-card"><div>Best Seller</div><span id="in_bestSeller">None</span></div>
@@ -214,9 +216,9 @@ td { color: black; border-bottom: 1px solid #eee; }
     <div style="text-align: center; color: white; margin: 40px 0 20px 0;">
       <div style="font-size: 16px; font-weight: bold; margin-bottom: 5px;">𝐃𝐮𝐤𝐢𝐤‘𝐬 𝐇𝐮𝐧𝐠𝐫𝐲 𝐇𝐮𝐛</div>
       <div style="font-size: 12px; margin-bottom: 10px;">contact@naydexph.com</div>
-      <div style="display: flex; justify-content: center; gap: 15px;">
-          <a href="https://www.facebook.com/dukikshungryhub" target="_blank"><img src="https://cdn-icons-png.flaticon.com/512/124/124010.png" width="25"></a>
-          <a href="https://www.instagram.com/dukikshungryhub" target="_blank"><img src="https://cdn-icons-png.flaticon.com/512/174/174855.png" width="25"></a>
+      <div class="social-links">
+          <a href="https://www.facebook.com/dukikshungryhub" target="_blank">Facebook</a>
+          <a href="https://www.instagram.com/dukikshungryhub" target="_blank">Instagram</a>
       </div>
     </div>
 </div>
@@ -284,26 +286,33 @@ async function fetchData() {
 function loginGlobal(name) {
     currentCrew = name;
     const now = new Date();
-    document.getElementById("crewHeaderDisplay").textContent = `Logged in: ${name} at ${now.toLocaleTimeString()} (${now.toLocaleDateString()})`;
+    const fullDate = now.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'});
+    const fullTime = now.toLocaleTimeString();
+    document.getElementById("crewHeaderDisplay").textContent = `Logged in: ${name} at ${fullDate} ${fullTime}`;
     document.getElementById("loginScreenGlobal").style.display = "none";
     document.getElementById("mainPOS").style.display = "block";
 }
 
 function logoutGlobal() {
-    currentCrew = "";
-    document.getElementById("loginScreenGlobal").style.display = "block";
-    document.getElementById("mainPOS").style.display = "none";
+    if(confirm("Are you sure you want to logout?")) {
+        currentCrew = "";
+        document.getElementById("loginScreenGlobal").style.display = "block";
+        document.getElementById("mainPOS").style.display = "none";
+    }
 }
 
 function switchTab(tab) {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.active && c.classList.remove('active'));
+    document.getElementById('onlineTab').classList.remove('active');
+    document.getElementById('instoreTab').classList.remove('active');
+    document.getElementById('onlineTabBtn').classList.remove('active');
+    document.getElementById('instoreTabBtn').classList.remove('active');
+    
     if(tab === 'online') {
-        document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
         document.getElementById('onlineTab').classList.add('active');
+        document.getElementById('onlineTabBtn').classList.add('active');
     } else {
-        document.querySelector('.tab-btn:nth-child(2)').classList.add('active');
         document.getElementById('instoreTab').classList.add('active');
+        document.getElementById('instoreTabBtn').classList.add('active');
     }
 }
 
@@ -350,11 +359,19 @@ function calculateChange() {
         disp.classList.remove("change-warning");
         box.classList.remove("calc-error");
     }
+    return change;
 }
 
 function logInstoreOrder() {
     const cashInp = document.getElementById("cashReceived");
     if(!cashInp.value) { cashInp.classList.add("error-bump"); return; }
+    
+    const currentChange = calculateChange();
+    if(currentChange < 0) {
+        cashInp.classList.add("error-bump");
+        return;
+    }
+    
     if(instoreCart.length === 0) return alert("Empty Cart!");
     
     let codes = []; let pretty = []; let total = 0;
@@ -372,7 +389,6 @@ function logInstoreOrder() {
     const ref = dStr.replace(/\//g,'') + "-" + tStr.replace(/[: ]/g,'');
     const noteVal = document.getElementById("instoreNotes").value;
     const received = parseFloat(cashInp.value) || 0;
-    const change = received - total;
 
     const hRow = document.createElement("tr");
     hRow.innerHTML = `
@@ -380,7 +396,7 @@ function logInstoreOrder() {
         <td>${currentCrew}</td>
         <td style="font-weight:bold;">${formatPHP(total)}</td>
         <td>${formatPHP(received)}</td>
-        <td>${formatPHP(change)}</td>
+        <td>${formatPHP(currentChange)}</td>
         <td><select class="history-select" data-val="Paid" onchange="saveHistory()"><option>Unpaid</option><option selected>Paid</option></select></td>
         <td><select class="history-select" data-val="Cash" onchange="saveHistory()"><option>GCash</option><option selected>Cash</option></select></td>
         <td>${pretty.join("<br>")}</td>
@@ -444,8 +460,9 @@ function updateSummary() {
             const priceIdx = isInstore ? 2 : 3;
             const itemsIdx = isInstore ? 15 : 14;
             sales += parseFloat(row.cells[priceIdx].innerText.replace(/,/g, '')) || 0;
-            const items = row.cells[itemsIdx].innerText.split(', ');
-            items.forEach(str => {
+            const itemsText = row.cells[itemsIdx].innerText;
+            const itemsArr = itemsText.split(', ');
+            itemsArr.forEach(str => {
                 const p = str.split('x ');
                 if(p.length > 1) {
                     const m = (isInstore ? menuInstore : menuOnline).find(x => x.code === p[1]);
