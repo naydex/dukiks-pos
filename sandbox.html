@@ -294,7 +294,12 @@ function loadSession() {
     const draft = localStorage.getItem("dukiks_draft");
     if(draft) {
         const d = JSON.parse(draft);
-        if(d.type) setPosType(d.type);
+        if(d.type) {
+          selectedType = d.type;
+          document.querySelectorAll('.pos-choice').forEach(b => b.classList.remove('active'));
+          const target = document.getElementById(d.type === 'online' ? 'btnOnline' : 'btnInstore');
+          if(target) target.classList.add('active');
+        }
         document.getElementById("customerName").value = d.name || "";
         document.getElementById("communitySelect").value = d.comm || "Home";
         document.getElementById("blockFloor").value = d.blk || "";
@@ -460,11 +465,10 @@ function saveHistory() {
 }
 
 function updateSummary() {
-    const process = (boxId, prefix, menu) => {
+    const processOnline = (boxId, prefix, menu) => {
         const box = document.getElementById(boxId);
         let sales = 0;
         let itemCounts = { "Fried Chicken": 0, "Pork Steak": 0, "Pork Chop": 0, "Vegetable Lumpia": 0, "Pork Lumpia": 0, "Rice": 0 };
-        
         box.querySelectorAll("tr").forEach(r => {
             sales += parseFloat(r.cells[2].innerText.replace(/,/g, '')) || 0;
             const itemsRaw = r.cells[13].innerText;
@@ -489,17 +493,43 @@ function updateSummary() {
         });
         document.getElementById(prefix + "totalOrders").textContent = box.querySelectorAll("tr").length;
         document.getElementById(prefix + "totalSales").textContent = formatPHP(sales);
-        
         let best = "None", max = 0;
         for (const [name, count] of Object.entries(itemCounts)) { if (count > max && count > 0 && name !== "Rice") { max = count; best = name; } }
         document.getElementById(prefix + "bestSeller").textContent = best;
-
-        const breakdown = document.getElementById(prefix === 'on_' ? "onlineItemBreakdown" : "instoreItemBreakdown");
+        const breakdown = document.getElementById("onlineItemBreakdown");
         const displayOrder = ["Fried Chicken", "Pork Steak", "Pork Chop", "Vegetable Lumpia", "Pork Lumpia", "Rice"];
         breakdown.innerHTML = displayOrder.map(n => `<div style="display:flex; justify-content:space-between; border-bottom:1px solid #333; padding:5px 0;"><span style="font-size:11px; color: #ddd;"><span style="color:#ff6b00; font-weight:bold; font-size:14px; margin-right:5px;">${itemCounts[n] || 0}</span> ${n.toUpperCase()}</span></div>`).join('');
     };
-    process("historyBox", "on_", menuOnline);
-    process("instoreHistoryBox", "in_", menuInstore);
+
+    const processInstore = () => {
+        const box = document.getElementById("instoreHistoryBox");
+        let sales = 0, counts = {};
+        menuInstore.forEach(m => counts[m.menu] = 0);
+        box.querySelectorAll("tr").forEach(r => {
+            sales += parseFloat(r.cells[2].innerText.replace(/,/g, '')) || 0;
+            const itemsRaw = r.cells[13].innerText;
+            if(itemsRaw) {
+                itemsRaw.split(', ').forEach(s => {
+                    const p = s.split('x ');
+                    if(p.length > 1) {
+                        const q = parseInt(p[0]) || 0;
+                        const m = menuInstore.find(x => x.code === p[1]);
+                        if(m) counts[m.menu] = (counts[m.menu] || 0) + q;
+                    }
+                });
+            }
+        });
+        document.getElementById("in_totalOrders").textContent = box.querySelectorAll("tr").length;
+        document.getElementById("in_totalSales").textContent = formatPHP(sales);
+        let best = "None", max = 0;
+        for (let name in counts) { if(counts[name] > max) { max = counts[name]; best = name; } }
+        document.getElementById("in_bestSeller").textContent = best;
+        const breakdown = document.getElementById("instoreItemBreakdown");
+        breakdown.innerHTML = Object.keys(counts).map(n => `<div style="display:flex; justify-content:space-between; border-bottom:1px solid #333; padding:5px 0;"><span style="font-size:11px; color: #ddd;"><span style="color:#ff6b00; font-weight:bold; font-size:14px; margin-right:5px;">${counts[n]}</span> ${n.toUpperCase()}</span></div>`).join('');
+    };
+
+    processOnline("historyBox", "on_", menuOnline);
+    processInstore();
 }
 
 function submitSalesLog(type) {
@@ -564,8 +594,28 @@ function copyReceipt(btn, isIn) {
 function editOrder(btn, isIn) {
     if(!confirm("Edit? This deletes entry.")) return;
     const r = btn.closest("tr"); const codes = r.cells[13].innerText.split(", ");
-    if(isIn) { instoreCart = []; codes.forEach(s => { const p = s.split("x "); instoreCart.push({code: p[1], qty: parseInt(p[0])}); }); renderCart('instore'); document.getElementById("instoreNotes").value = r.cells[6].innerText; }
-    else { onlineCart = []; codes.forEach(s => { const p = s.split("x "); onlineCart.push({code: p[1], qty: parseInt(p[0])}); }); renderCart('online'); document.getElementById("customerName").value = r.cells[5].innerText; document.getElementById("specialInstructions").value = r.cells[8].innerText; }
+    if(isIn) { 
+        instoreCart = []; codes.forEach(s => { const p = s.split("x "); instoreCart.push({code: p[1], qty: parseInt(p[0])}); }); 
+        renderCart('instore'); 
+        document.getElementById("instoreNotes").value = r.cells[6].innerText; 
+    } else { 
+        onlineCart = []; codes.forEach(s => { const p = s.split("x "); onlineCart.push({code: p[1], qty: parseInt(p[0])}); }); 
+        renderCart('online'); 
+        document.getElementById("customerName").value = r.cells[5].innerText; 
+        document.getElementById("specialInstructions").value = r.cells[8].innerText;
+        const fullAddr = r.cells[6].innerText;
+        if(fullAddr.includes(" - Blk ")) {
+            const parts = fullAddr.split(" - Blk ");
+            document.getElementById("communitySelect").value = parts[0];
+            const subParts = parts[1].split(", Lot ");
+            document.getElementById("blockFloor").value = subParts[0].replace("Blk ", "");
+            document.getElementById("lotRoom").value = subParts[1];
+        } else {
+            document.getElementById("communitySelect").value = "Home";
+            document.getElementById("customerAddress").value = fullAddr;
+        }
+        toggleAddressFields();
+    }
     r.remove(); saveHistory(); saveCurrentDraft();
 }
 
