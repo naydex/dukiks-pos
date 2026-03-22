@@ -8,11 +8,11 @@
 body {
   font-family: Arial, sans-serif;
   margin: 0;
-  padding: 120px 10px 40px 10px;
+  padding: 80px 10px 40px 10px;
   background-color: #ff6b00;
   font-size: 16px;
 }
-.logo-container { text-align: center; margin-top: 10px; }
+.logo-container { text-align: center; margin-top: 5px; }
 .logo-container img { max-height: 80px; width: auto; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3)); }
 h1 { text-align: center; font-weight: bold; font-size: 28px; color: white; margin-top: 5px; }
 .subtitle { text-align: center; font-size: 11px; color: white; margin-bottom: 20px; }
@@ -72,9 +72,10 @@ td { color: black; border-bottom: 1px solid #eee; }
 .login-btn { background: #ff6b00; padding: 25px; border-radius: 15px; text-align: center; cursor: pointer; font-weight: bold; color: white; border: none; box-shadow: 0 6px #b34a00; font-size: 18px; transition: all 0.1s; position: relative; }
 .login-btn:active { top: 3px; box-shadow: 0 2px #b34a00; }
 .login-btn.pos-choice { background: #000; box-shadow: 0 6px #333; }
+.login-btn.pos-choice.active { background: #4cd964; box-shadow: 0 6px #38a84d; }
 .login-btn.pos-choice:active { box-shadow: 0 2px #333; }
-.login-btn.selected { background: #4cd964; box-shadow: 0 6px #38a84d; }
 .crew-timestamp { text-align: center; color: white; font-size: 13px; margin-top: 5px; margin-bottom: 15px; }
+.item-del-btn { background:none; border:none; color:red; cursor:pointer; font-size:18px; padding:0 5px; }
 </style>
 </head>
 <body>
@@ -83,13 +84,16 @@ td { color: black; border-bottom: 1px solid #eee; }
   <div class="date-display" id="datePHT"></div>
 </div>
 
-<div id="loginScreen" class="panel white-panel" style="margin-top: 100px;">
-    <h2 id="loginTitle">Select POS Type</h2>
+<div id="loginScreen" class="panel white-panel" style="margin-top: 10px;">
+    <div class="logo-container"><img src="dukiks-logo.png" alt="Dukiks Logo"></div>
+    <h2 style="margin-top:10px;">Login Panel</h2>
+    <div style="font-weight:bold; margin-bottom:5px;">1. Select POS Type</div>
     <div id="posSelection" class="login-grid">
-        <div class="login-btn pos-choice" onclick="selectPOS('online')">ONLINE POS</div>
-        <div class="login-btn pos-choice" onclick="selectPOS('instore')">IN-STORE POS</div>
+        <div class="login-btn pos-choice" id="btnOnline" onclick="setPosType('online')">ONLINE POS</div>
+        <div class="login-btn pos-choice" id="btnInstore" onclick="setPosType('instore')">IN-STORE POS</div>
     </div>
-    <div id="crewSelection" class="login-grid" style="display:none;"></div>
+    <div style="font-weight:bold; margin:20px 0 5px 0;">2. Select Employee Name</div>
+    <div id="crewSelection" class="login-grid"></div>
 </div>
 
 <div id="mainContainer" style="display:none;">
@@ -100,7 +104,7 @@ td { color: black; border-bottom: 1px solid #eee; }
     <div id="crewHeaderDisplay" class="crew-timestamp"></div>
 
     <div id="onlinePOS" style="display:none;">
-      <div class="subtitle">Order Intake Form (Online)</div>
+      <div class="subtitle">Online Checkout</div>
       <div class="panel white-panel">
         <h2>Order Intake</h2>
         <div id="validationError" class="error-msg">⚠️ Please check Name, Address, and Items!</div>
@@ -125,7 +129,7 @@ td { color: black; border-bottom: 1px solid #eee; }
         <div id="onlineProductButtons" class="product-grid" style="margin-top:20px;"></div>
 
         <table class="order-table">
-          <thead><tr><th>Order <span class="required-star">*</span></th><th>Qty</th><th>Price</th></tr></thead>
+          <thead><tr><th>Order <span class="required-star">*</span></th><th>Qty</th><th>Price</th><th></th></tr></thead>
           <tbody id="onlineOrderBody"></tbody>
         </table>
         <div class="input-row"><label>Notes</label><input type="text" id="specialInstructions" placeholder="Special Instructions"></div>
@@ -154,11 +158,11 @@ td { color: black; border-bottom: 1px solid #eee; }
     </div>
 
     <div id="instorePOS" style="display:none;">
-        <div class="subtitle">Dukik's In-Store Checkout</div>
+        <div class="subtitle">In-store Checkout</div>
         <div class="panel white-panel">
             <div id="instoreProductButtons" class="product-grid"></div>
             <table class="order-table">
-                <thead><tr><th>Item</th><th>Qty</th><th>Total</th></tr></thead>
+                <thead><tr><th>Item</th><th>Qty</th><th>Total</th><th></th></tr></thead>
                 <tbody id="instoreOrderBody"></tbody>
             </table>
             <div class="input-row"><label>Notes</label><input type="text" id="instoreNotes" placeholder="Additional notes for this sale"></div>
@@ -245,14 +249,14 @@ async function init() {
     } catch (e) { console.error(e); }
 }
 
-function selectPOS(type) {
+function setPosType(type) {
     selectedType = type;
-    document.getElementById("posSelection").style.display = "none";
-    document.getElementById("loginTitle").textContent = "Select Employee Name";
-    document.getElementById("crewSelection").style.display = "grid";
+    document.querySelectorAll('.pos-choice').forEach(b => b.classList.remove('active'));
+    document.getElementById(type === 'online' ? 'btnOnline' : 'btnInstore').classList.add('active');
 }
 
 function finalizeLogin(name) {
+    if(!selectedType) { alert("Please select POS Type first!"); return; }
     currentCrew = name;
     document.getElementById("loginScreen").style.display = "none";
     document.getElementById("mainContainer").style.display = "block";
@@ -268,6 +272,12 @@ function addToCart(type, code) {
     renderCart(type);
 }
 
+function removeFromCart(type, idx) {
+    const cart = type === 'online' ? onlineCart : instoreCart;
+    cart.splice(idx, 1);
+    renderCart(type);
+}
+
 function renderCart(type) {
     const cart = type === 'online' ? onlineCart : instoreCart;
     const body = document.getElementById(type + "OrderBody");
@@ -278,7 +288,7 @@ function renderCart(type) {
         const m = menu.find(x => x.code === item.code);
         const total = m.price * item.qty;
         grand += total;
-        body.innerHTML += `<tr><td>${m.menu}</td><td><input type="number" value="${item.qty}" min="0" style="width:50px" onchange="updateQty('${type}', ${idx}, this.value)"></td><td>${formatPHP(total)}</td></tr>`;
+        body.innerHTML += `<tr><td>${m.menu}</td><td><input type="number" value="${item.qty}" min="0" style="width:50px" onchange="updateQty('${type}', ${idx}, this.value)"></td><td>${formatPHP(total)}</td><td><button class="item-del-btn" onclick="removeFromCart('${type}', ${idx})">❌</button></td></tr>`;
     });
     if(type === 'instore') {
         document.getElementById("instoreGrandTotal").textContent = formatPHP(grand);
@@ -286,7 +296,7 @@ function renderCart(type) {
     } else {
         const oldGT = document.getElementById("onlineGrandTotalRow"); if(oldGT) oldGT.remove();
         const tr = document.createElement("tr"); tr.id = "onlineGrandTotalRow";
-        tr.innerHTML = `<td colspan="2" style="text-align:right; font-weight:bold;">Grand Total:</td><td style="color:red; font-weight:bold;">${formatPHP(grand)}</td>`;
+        tr.innerHTML = `<td colspan="2" style="text-align:right; font-weight:bold;">Grand Total:</td><td colspan="2" style="color:red; font-weight:bold;">${formatPHP(grand)}</td>`;
         body.appendChild(tr);
     }
 }
@@ -312,7 +322,7 @@ function logOnlineOrder() {
     const now = new Date();
     const dStr = `${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getDate().toString().padStart(2,'0')}/${now.getFullYear()}`;
     const tStr = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-    const ref = dStr.replace(/\//g,'') + "-" + tStr.replace(/[: ]/g,'');
+    const ref = dStr.replace(/\//g,'') + "-" + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'}).replace(/[: ]/g,'');
     const fullAddr = (comm.value === "Home") ? addr.value : `${comm.value} - Blk ${blk.value}, Lot ${lot.value}`;
     
     let codes = [], pretty = [], total = 0;
@@ -329,6 +339,7 @@ function logOnlineOrder() {
         <th style="display:none">${dStr}</th><th style="display:none">${tStr}</th><th style="display:none">${codes.join(", ")}</th><th style="display:none">${currentCrew}</th>`;
     document.getElementById("historyBox").appendChild(tr);
     saveHistory();
+    copySummary(tr.querySelector('button'), false);
     onlineCart = []; renderCart('online');
     name.value = ""; blk.value = ""; lot.value = ""; addr.value = ""; document.getElementById("specialInstructions").value = "";
     document.getElementById("logOnlineBtn").textContent = "✅ Logged!";
@@ -347,12 +358,12 @@ function calculateChange() {
 
 function logInstoreOrder() {
     const cash = document.getElementById("cashReceived");
-    if(calculateChange() < 0 || instoreCart.length === 0) { cash.classList.add("error-bump"); return; }
+    if(!cash.value || calculateChange() < 0 || instoreCart.length === 0) { cash.classList.add("error-bump"); return; }
     
     const now = new Date();
     const dStr = `${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getDate().toString().padStart(2,'0')}/${now.getFullYear()}`;
     const tStr = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-    const ref = dStr.replace(/\//g,'') + "-" + tStr.replace(/[: ]/g,'');
+    const ref = dStr.replace(/\//g,'') + "-" + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'}).replace(/[: ]/g,'');
     
     let codes = [], pretty = [], total = 0;
     instoreCart.forEach(i => { const m = menuInstore.find(x => x.code === i.code); codes.push(`${i.qty}x ${m.code}`); pretty.push(`${i.qty}x ${m.menu}`); total += m.price * i.qty; });
@@ -423,27 +434,49 @@ function submitSalesLog(type) {
 }
 
 function copySummary(btn, isIn) {
-    const r = btn.closest("tr");
-    const items = r.cells[isIn ? 13 : 13].innerText.split(', ').map(s => { const p = s.split('x '); const m = (isIn ? menuInstore : menuOnline).find(x => x.code === p[1]); return `${p[0]}x ${m ? m.menu : p[1]}`; }).join('\n');
-    const text = isIn ? `In-Store Receipt\nCrew: ${r.cells[1].innerText}\nTotal: ₱${r.cells[2].innerText}\nItems:\n${items}` : `${r.cells[9].innerText}\n${r.cells[11].innerText} ${r.cells[12].innerText}\nCrew: ${r.cells[14].innerText}\nName: ${r.cells[5].innerText}\nAddr: ${r.cells[6].innerText}\nTotal: ₱${r.cells[2].innerText}\nOrders:\n${items}\nNotes: ${r.cells[8].innerText}`;
-    navigator.clipboard.writeText(text);
-    btn.innerText = "✅"; setTimeout(() => btn.innerText = "Copy", 1000);
+    const row = btn.closest("tr");
+    const refNum = row.cells[9].innerText; const dateStr = row.cells[11].innerText;
+    const timeStr = row.cells[12].innerText;
+    const name = isIn ? "Walk-in" : row.cells[5].innerText; 
+    const addr = isIn ? "Counter" : row.cells[6].innerText; 
+    const total = row.cells[2].innerText;
+    const notes = row.cells[isIn ? 6 : 8].innerText;
+    const ordersRaw = row.cells[13].innerText;
+
+    let shortAddr = "";
+    if(addr.includes(" - Blk ")) {
+        const parts = addr.split(" - Blk ");
+        const commCode = parts[0].substring(0, 3).toUpperCase();
+        const subParts = parts[1].split(", Lot ");
+        shortAddr = `${commCode} ${subParts[0]}/${subParts[1]}`;
+    } else {
+        shortAddr = addr;
+    }
+
+    const orderCodes = ordersRaw.split(", ");
+    const menuRef = isIn ? menuInstore : menuOnline;
+    const fullOrderNames = orderCodes.map(item => { const parts = item.split("x "); const q = parts[0]; const c = parts[1]; const m = menuRef.find(x => x.code === c); return `${q}x ${m ? m.menu : c}`; }).join("\n");
+    const summary = `${refNum}\n${dateStr} ${timeStr}\nName: ${name}\nAddress: ${addr}\n\n${shortAddr} ₱${total}\n\nOrders:\n${fullOrderNames}\n\nSpecial Notes: ${notes}`;
+    
+    navigator.clipboard.writeText(summary);
     if(!isIn) {
         window.location.href = "fb-messenger://user-thread/1629578618166443";
         setTimeout(() => { if (document.hasFocus()) { window.open("https://www.messenger.com/t/1629578618166443", "_blank"); } }, 500);
     }
+    const ot = btn.innerText; btn.innerText = "✅";
+    setTimeout(() => { btn.innerText = ot; }, 1500);
 }
 
 function copyReceipt(btn, isIn) {
     const r = btn.closest("tr");
-    const items = r.cells[isIn ? 13 : 13].innerText.split(', ').map(s => { const p = s.split('x '); const m = (isIn ? menuInstore : menuOnline).find(x => x.code === p[1]); return `${p[0]}x ${m ? m.menu : p[1]}`; }).join('\n');
-    navigator.clipboard.writeText(`${items}\nTotal: ₱${r.cells[2].innerText}`);
+    const items = r.cells[13].innerText.split(', ').map(s => { const p = s.split('x '); const m = (isIn ? menuInstore : menuOnline).find(x => x.code === p[1]); return `${p[0]}x ${m ? m.menu : p[1]}`; }).join('\n');
+    navigator.clipboard.writeText(`${items}\nTotal Amount: ₱${r.cells[2].innerText}`);
     btn.innerText = "✅"; setTimeout(() => btn.innerText = "Receipt", 1000);
 }
 
 function editOrder(btn, isIn) {
     if(!confirm("Edit? This deletes entry.")) return;
-    const r = btn.closest("tr"); const codes = r.cells[isIn ? 13 : 13].innerText.split(", ");
+    const r = btn.closest("tr"); const codes = r.cells[13].innerText.split(", ");
     if(isIn) { instoreCart = []; codes.forEach(s => { const p = s.split("x "); instoreCart.push({code: p[1], qty: parseInt(p[0])}); }); renderCart('instore'); document.getElementById("instoreNotes").value = r.cells[6].innerText; }
     else { onlineCart = []; codes.forEach(s => { const p = s.split("x "); onlineCart.push({code: p[1], qty: parseInt(p[0])}); }); renderCart('online'); document.getElementById("customerName").value = r.cells[5].innerText; document.getElementById("specialInstructions").value = r.cells[8].innerText; }
     r.remove(); saveHistory();
