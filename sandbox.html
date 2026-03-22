@@ -31,7 +31,7 @@ td { color: black; border-bottom: 1px solid #eee; }
 .input-row { display: flex; flex-direction: column; margin-bottom: 12px; max-width: 850px; margin: 0 auto 12px auto; }
 .input-row label { font-weight: bold; color: black; margin-bottom: 5px; font-size: 14px;}
 .input-row input, .input-row select { padding: 8px; font-size: 16px; border: 2px solid #ccc; border-radius: 8px; transition: all 0.3s; width: 100%; box-sizing: border-box; }
-.side-by-side { display: flex; gap: 10px; justify-content: flex-start; max-width: 850px; margin: 0 auto 12px auto; }
+.side-by-side { display: flex; gap: 10px; justify-content: flex-start; max-width: 850px; margin: 0 auto 12px auto; align-items: flex-start; }
 .side-by-side .input-row { flex: 0 0 auto; margin: 0; }
 .small-input { width: 80px !important; }
 .hidden-field { display: none; }
@@ -60,13 +60,13 @@ td { color: black; border-bottom: 1px solid #eee; }
 .error-bump { border: 2px solid #ff3b30 !important; animation: shake 0.4s ease-in-out; }
 @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-5px); } }
 .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px; }
-.category-title { grid-column: 1 / -1; background: #000; color: #ff6b00; padding: 5px 15px; border-radius: 8px; font-size: 14px; font-weight: bold; margin-top: 10px; }
+.category-title { grid-column: 1 / -1; background: #000; color: #ff6b00; padding: 5px 15px; border-radius: 8px; font-size: 14px; font-weight: bold; margin-top: 10px; text-align: center; }
 .prod-btn { background: #ff6b00; border: none; color: white; padding: 15px 10px; border-radius: 12px; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; box-shadow: 0 5px #b34a00; transition: all 0.1s; position: relative; top: 0; }
 .prod-btn:active { top: 3px; box-shadow: 0 2px #b34a00; }
 .prod-btn.clicked { background: #4cd964 !important; box-shadow: 0 5px #38a84d !important; }
-.prod-btn span { font-size: 10px; color: #fff; margin-top: 5px; opacity: 0.8; }
+.prod-btn span { font-size: 11px; color: #ff0000; margin-top: 5px; background: white; padding: 2px 6px; border-radius: 4px; font-weight: 900; }
 .calculator-box { background: #f0f0f0; padding: 15px; border-radius: 12px; margin-top: 20px; border: 1px solid #ccc; }
-.calc-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 18px; font-weight: bold; }
+.calc-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 18px; font-weight: bold; }
 .change-amt { color: #28a745; font-size: 24px; }
 .change-warning { color: #ff3b30 !important; }
 .login-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
@@ -78,6 +78,13 @@ td { color: black; border-bottom: 1px solid #eee; }
 .login-btn.pos-choice:active { box-shadow: 0 2px #333; }
 .crew-timestamp { text-align: center; color: white; font-size: 13px; margin-top: 5px; margin-bottom: 15px; }
 .item-del-btn { background:none; border:none; color:red; cursor:pointer; font-size:18px; padding:0 5px; }
+
+.numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-top: 10px; width: 100%; max-width: 250px; }
+.numpad button { padding: 12px; font-size: 16px; font-weight: bold; border-radius: 8px; border: 1px solid #ccc; background: white; cursor: pointer; color: black; box-shadow: 0 2px #ddd; }
+.numpad button:active { transform: translateY(2px); box-shadow: none; }
+.numpad .wide { grid-column: span 1; }
+.numpad .special { background: #333; color: white; font-size: 12px; }
+.numpad .exact { background: #4cd964; color: white; font-size: 11px; }
 </style>
 </head>
 <body>
@@ -121,8 +128,18 @@ td { color: black; border-bottom: 1px solid #eee; }
           </select>
         </div>
         <div id="subdivisionGroup" class="hidden-field side-by-side">
-          <div class="input-row"><label>BLK/Floor <span class="required-star">*</span></label><input type="text" id="blockFloor" class="small-input" placeholder="000" oninput="this.value = this.value.replace(/[^0-9]/g, '').substring(0,4); saveCurrentDraft();"></div>
-          <div class="input-row"><label>Lot/Room <span class="required-star">*</span></label><input type="text" id="lotRoom" class="small-input" placeholder="000" oninput="this.value = this.value.replace(/[^0-9]/g, '').substring(0,4); saveCurrentDraft();"></div>
+          <div>
+            <div class="input-row"><label>BLK/Floor <span class="required-star">*</span></label><input type="text" id="blockFloor" class="small-input" placeholder="000" oninput="this.value = this.value.replace(/[^0-9]/g, '').substring(0,4); saveCurrentDraft();" onfocus="setCurrentNumpadTarget('blockFloor')"></div>
+            <div class="input-row"><label>Lot/Room <span class="required-star">*</span></label><input type="text" id="lotRoom" class="small-input" placeholder="000" oninput="this.value = this.value.replace(/[^0-9]/g, '').substring(0,4); saveCurrentDraft();" onfocus="setCurrentNumpadTarget('lotRoom')"></div>
+          </div>
+          <div class="numpad" style="max-width:180px;">
+            <button class="special" onclick="numpadInput('X')">X</button>
+            <button class="special" onclick="numpadInput('C')">Clear</button>
+            <button onclick="numpadInput('0')">0</button>
+            <button onclick="numpadInput('1')">1</button><button onclick="numpadInput('2')">2</button><button onclick="numpadInput('3')">3</button>
+            <button onclick="numpadInput('4')">4</button><button onclick="numpadInput('5')">5</button><button onclick="numpadInput('6')">6</button>
+            <button onclick="numpadInput('7')">7</button><button onclick="numpadInput('8')">8</button><button onclick="numpadInput('9')">9</button>
+          </div>
         </div>
         <div id="homeAddressGroup">
           <div class="input-row"><label>Home Address <span class="required-star">*</span></label><input type="text" id="customerAddress" placeholder="Street / Barangay / Landmark" oninput="saveCurrentDraft()"></div>
@@ -170,8 +187,19 @@ td { color: black; border-bottom: 1px solid #eee; }
             <div class="input-row"><label>Notes</label><input type="text" id="instoreNotes" placeholder="Additional notes for this sale" oninput="saveCurrentDraft()"></div>
             <div class="calculator-box" id="calcBox">
                 <div class="calc-row"><span>Grand Total:</span><span id="instoreGrandTotal">0.00</span></div>
-                <div class="calc-row"><span>Cash Received: <span class="required-star">*</span></span><input type="number" id="cashReceived" style="width:120px;" oninput="calculateChange(); saveCurrentDraft();"></div>
                 <div class="calc-row" style="border-top: 1px solid #ccc; padding-top:10px;"><span>Change:</span><span id="changeDue" class="change-amt">0.00</span></div>
+                <div class="calc-row"><span>Cash Received: <span class="required-star">*</span></span><input type="number" id="cashReceived" style="width:120px;" oninput="calculateChange(); saveCurrentDraft();" onfocus="setCurrentNumpadTarget('cashReceived')"></div>
+                <div style="display: flex; justify-content: flex-end;">
+                  <div class="numpad">
+                    <button class="special" onclick="numpadInput('X')">X</button>
+                    <button class="special" onclick="numpadInput('C')">Clear</button>
+                    <button class="exact" onclick="numpadInput('E')">Exact Amt</button>
+                    <button onclick="numpadInput('1')">1</button><button onclick="numpadInput('2')">2</button><button onclick="numpadInput('3')">3</button>
+                    <button onclick="numpadInput('4')">4</button><button onclick="numpadInput('5')">5</button><button onclick="numpadInput('6')">6</button>
+                    <button onclick="numpadInput('7')">7</button><button onclick="numpadInput('8')">8</button><button onclick="numpadInput('9')">9</button>
+                    <button onclick="numpadInput('0')">0</button><button onclick="numpadInput('000')">000</button><button onclick="numpadInput('.')">.</button>
+                  </div>
+                </div>
             </div>
             <button class="action-btn" id="logInstoreBtn" onclick="logInstoreOrder()">Log Order & Clear</button>
         </div>
@@ -218,7 +246,7 @@ const MENU_IN_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRUovN3y6yf
 const COMM_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRUovN3y6yfyLJ0yLVqvrvEEUaipZ3gf6mkuSqJ4oBOg0cEVNwwDs9PC6TH2U0u9kE4a3jEaugquiGg/pub?gid=1695333389&output=csv";
 const CREW_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRUovN3y6yfyLJ0yLVqvrvEEUaipZ3gf6mkuSqJ4oBOg0cEVNwwDs9PC6TH2U0u9kE4a3jEaugquiGg/pub?gid=1256574121&output=csv";
 
-let menuOnline = [], menuInstore = [], crewList = [], currentCrew = "", selectedType = "", onlineCart = [], instoreCart = [];
+let menuOnline = [], menuInstore = [], crewList = [], currentCrew = "", selectedType = "", onlineCart = [], instoreCart = [], currentNumpadTarget = "";
 
 async function init() {
     try {
@@ -436,7 +464,7 @@ function logOnlineOrder() {
 }
 
 function calculateChange() {
-    const total = parseFloat(document.getElementById("instoreGrandTotal").textContent.replace(/,/g, ''));
+    const total = parseFloat(document.getElementById("instoreGrandTotal").textContent.replace(/,/g, '')) || 0;
     const received = parseFloat(document.getElementById("cashReceived").value) || 0;
     const change = received - total;
     const disp = document.getElementById("changeDue");
@@ -651,6 +679,23 @@ function toggleAddressFields() { const s = document.getElementById("subdivisionG
 function restoreSelects(id) { document.getElementById(id).querySelectorAll('select').forEach(s => { s.value = s.getAttribute('data-val'); s.onchange = saveHistory; }); }
 function formatPHP(n) { return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 function updateClock() { const n = new Date(); let h = n.getHours(); const a = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12; document.getElementById('timePHT').textContent = `${h.toString().padStart(2,'0')}:${n.getMinutes().toString().padStart(2,'0')}:${n.getSeconds().toString().padStart(2,'0')} ${a}`; document.getElementById('datePHT').textContent = n.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'2-digit', year:'numeric'}); }
+
+function setCurrentNumpadTarget(id) { currentNumpadTarget = id; }
+function numpadInput(val) {
+  if(!currentNumpadTarget) return;
+  const target = document.getElementById(currentNumpadTarget);
+  if(val === 'X') { target.value = target.value.slice(0, -1); }
+  else if(val === 'C') { target.value = ''; }
+  else if(val === 'E') { 
+    const gt = document.getElementById("instoreGrandTotal").textContent.replace(/,/g, '');
+    target.value = gt;
+  }
+  else { target.value += val; }
+  
+  if(currentNumpadTarget === 'cashReceived') calculateChange();
+  saveCurrentDraft();
+}
+
 setInterval(updateClock, 1000);
 window.onload = init;
 </script>
