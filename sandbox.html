@@ -240,6 +240,7 @@ const MENU_ON_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRUovN3y6yf
 const MENU_IN_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRUovN3y6yfyLJ0yLVqvrvEEUaipZ3gf6mkuSqJ4oBOg0cEVNwwDs9PC6TH2U0u9kE4a3jEaugquiGg/pub?gid=1821850012&output=csv";
 const COMM_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRUovN3y6yfyLJ0yLVqvrvEEUaipZ3gf6mkuSqJ4oBOg0cEVNwwDs9PC6TH2U0u9kE4a3jEaugquiGg/pub?gid=1695333389&output=csv";
 const CREW_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRUovN3y6yfyLJ0yLVqvrvEEUaipZ3gf6mkuSqJ4oBOg0cEVNwwDs9PC6TH2U0u9kE4a3jEaugquiGg/pub?gid=1256574121&output=csv";
+const GATE_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRUovN3y6yfyLJ0yLVqvrvEEUaipZ3gf6mkuSqJ4oBOg0cEVNwwDs9PC6TH2U0u9kE4a3jEaugquiGg/pub?gid=541635867&output=csv";
 
 let menuOnline = [], menuInstore = [], crewList = [], currentCrew = "", selectedType = "", onlineCart = [], instoreCart = [], currentNumpadTarget = "";
 
@@ -283,6 +284,23 @@ async function init() {
     } catch (e) { console.error(e); }
 }
 
+async function checkGatePassword() {
+    try {
+        const response = await fetch(GATE_URL);
+        const text = await response.text();
+        const rows = text.split('\n');
+        for (let row of rows) {
+            const cols = row.split(',');
+            if (cols[0] && cols[0].trim() === "checkGatePassword") {
+                return cols[1].trim();
+            }
+        }
+    } catch (e) {
+        console.error("Gate check failed", e);
+    }
+    return null;
+}
+
 function setPosType(type) {
     selectedType = type;
     document.querySelectorAll('.pos-choice').forEach(b => b.classList.remove('active'));
@@ -291,12 +309,19 @@ function setPosType(type) {
     saveCurrentDraft();
 }
 
-function finalizeLogin(name) {
+async function finalizeLogin(name) {
     if(!selectedType) { alert("Please select POS Type first!"); return; }
+    
+    const gatePass = await checkGatePassword();
+    if(gatePass) {
+        const input = prompt("Enter Security Gate Password:");
+        if(input !== gatePass) { alert("Invalid Gate Password!"); return; }
+    }
+
     const crew = crewList.find(c => c.name === name);
     if(crew && crew.password) {
-        const pass = prompt("Enter Password for " + name + ":");
-        if(pass !== crew.password) { alert("Incorrect Password!"); return; }
+        const pass = prompt("Enter Personal Password for " + name + ":");
+        if(pass !== crew.password) { alert("Incorrect Personal Password!"); return; }
     }
     currentCrew = name;
     localStorage.setItem("dukiks_session", JSON.stringify({crew: name, type: selectedType}));
