@@ -83,15 +83,41 @@ td { color: black; border-bottom: 1px solid #eee; }
 .numpad .special { background: #333; color: white; font-size: 12px; }
 .numpad .exact { background: #4cd964; color: white; font-size: 11px; }
 #cashReceived { font-size: 24px !important; font-weight: bold; }
+
+#gatePanel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #ff6b00;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+#gatePanel .logo-container { margin-bottom: 20px; }
+#gatePanel h1 { margin-bottom: 40px; }
 </style>
 </head>
 <body>
+
+<div id="gatePanel">
+    <div class="logo-container"><img src="dukiks-logo.png" alt="Dukiks Logo"></div>
+    <h1>SECURITY GATE</h1>
+    <div class="input-row" style="width: 300px;">
+        <input type="password" id="gatePassword" placeholder="Enter Gate Password" style="text-align: center; font-size: 20px; padding: 15px;">
+    </div>
+    <button class="action-btn" onclick="verifyGate()">UNLOCK POS</button>
+</div>
+
 <div class="floating-datetime">
   <div class="digital-time" id="timePHT"></div>
   <div class="date-display" id="datePHT"></div>
 </div>
 
-<div id="loginScreen" class="panel white-panel" style="margin-top: 10px;">
+<div id="loginScreen" class="panel white-panel" style="margin-top: 10px; display: none;">
     <div class="logo-container"><img src="dukiks-logo.png" alt="Dukiks Logo"></div>
     <h2 style="margin-top:10px;">Login Panel</h2>
     <div style="font-weight:bold; text-align:center; margin-bottom:5px;">Select POS</div>
@@ -243,15 +269,26 @@ const CREW_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRUovN3y6yfyLJ
 const GATE_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRUovN3y6yfyLJ0yLVqvrvEEUaipZ3gf6mkuSqJ4oBOg0cEVNwwDs9PC6TH2U0u9kE4a3jEaugquiGg/pub?gid=541635867&output=csv";
 
 let menuOnline = [], menuInstore = [], crewList = [], currentCrew = "", selectedType = "", onlineCart = [], instoreCart = [], currentNumpadTarget = "";
+let remoteGatePass = "";
 
 async function init() {
     try {
-        const [on, ins, com, crw] = await Promise.all([
+        const [on, ins, com, crw, gate] = await Promise.all([
             fetch(MENU_ON_URL).then(r => r.text()),
             fetch(MENU_IN_URL).then(r => r.text()),
             fetch(COMM_URL).then(r => r.text()),
-            fetch(CREW_URL).then(r => r.text())
+            fetch(CREW_URL).then(r => r.text()),
+            fetch(GATE_URL).then(r => r.text())
         ]);
+        
+        const gateRows = gate.split('\n').slice(1);
+        gateRows.forEach(r => {
+            const cols = r.split(',');
+            if(cols[1] && cols[1].trim() === "checkGatePassword") {
+                remoteGatePass = cols[2] ? cols[2].trim() : "";
+            }
+        });
+
         menuOnline = on.split('\n').slice(1).map(r => { const c = r.split(','); return c.length >= 4 ? {type: c[0].trim(), menu: c[1].trim(), code: c[2].trim(), price: parseFloat(c[3])} : null; }).filter(x => x);
         menuInstore = ins.split('\n').slice(1).map(r => { const c = r.split(','); return c.length >= 4 ? {type: c[0].trim(), menu: c[1].trim(), code: c[2].trim(), price: parseFloat(c[3])} : null; }).filter(x => x);
         const buildGrid = (data, targetId, cartName) => {
@@ -284,21 +321,14 @@ async function init() {
     } catch (e) { console.error(e); }
 }
 
-async function checkGatePassword() {
-    try {
-        const response = await fetch(GATE_URL);
-        const text = await response.text();
-        const rows = text.split('\n');
-        for (let row of rows) {
-            const cols = row.split(',');
-            if (cols[0] && cols[0].trim() === "checkGatePassword") {
-                return cols[1].trim();
-            }
-        }
-    } catch (e) {
-        console.error("Gate check failed", e);
+function verifyGate() {
+    const input = document.getElementById("gatePassword").value;
+    if (input === remoteGatePass) {
+        document.getElementById("gatePanel").style.display = "none";
+        document.getElementById("loginScreen").style.display = "block";
+    } else {
+        alert("Access Denied: Incorrect Gate Password");
     }
-    return null;
 }
 
 function setPosType(type) {
@@ -309,19 +339,12 @@ function setPosType(type) {
     saveCurrentDraft();
 }
 
-async function finalizeLogin(name) {
+function finalizeLogin(name) {
     if(!selectedType) { alert("Please select POS Type first!"); return; }
-    
-    const gatePass = await checkGatePassword();
-    if(gatePass) {
-        const input = prompt("Enter Security Gate Password:");
-        if(input !== gatePass) { alert("Invalid Gate Password!"); return; }
-    }
-
     const crew = crewList.find(c => c.name === name);
     if(crew && crew.password) {
-        const pass = prompt("Enter Personal Password for " + name + ":");
-        if(pass !== crew.password) { alert("Incorrect Personal Password!"); return; }
+        const pass = prompt("Enter Password for " + name + ":");
+        if(pass !== crew.password) { alert("Incorrect Password!"); return; }
     }
     currentCrew = name;
     localStorage.setItem("dukiks_session", JSON.stringify({crew: name, type: selectedType}));
@@ -329,6 +352,7 @@ async function finalizeLogin(name) {
 }
 
 function showMain(name, type) {
+    document.getElementById("gatePanel").style.display = "none";
     document.getElementById("loginScreen").style.display = "none";
     document.getElementById("mainContainer").style.display = "block";
     document.getElementById("onlinePOS").style.display = type === 'online' ? "block" : "none";
